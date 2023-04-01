@@ -1,0 +1,14 @@
+{
+    "database": {
+        "host": "101.43.168.188",
+        "port": 3306,
+        "user": "root",
+        "password": "zkw030813",
+        "database_name": "public"
+    },
+    "server": {
+        "host": "localhost",
+        "port": 11451
+    }
+
+}

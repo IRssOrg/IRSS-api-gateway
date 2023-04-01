@@ -52,7 +52,7 @@ func Login(c *gin.Context) {
 	}
 	var passwordref string
 	var id int64
-	err := pool.QueryRow("select password, id from public.user where username = $1", req.Username).Scan(&passwordref, &id)
+	err := pool.QueryRow("select password, id from public.user where username = ?", req.Username).Scan(&passwordref, &id)
 	if err != nil {
 		log.Println("username invalid in auth ", err)
 		return
@@ -96,7 +96,7 @@ func Register(c *gin.Context) {
 		return
 	}
 	var id int64
-	err := pool.QueryRow("select id from public.user where username = $1", req.Username).Scan(&id)
+	err := pool.QueryRow("select id from public.user where username = ?", req.Username).Scan(&id)
 	if err == nil {
 		c.JSON(200, lib.RegisterResp{
 			StatusCode: 0,
@@ -104,7 +104,9 @@ func Register(c *gin.Context) {
 		})
 		return
 	}
-	err = pool.QueryRow("insert into public.user(username, password) values($1, $2) returning id", req.Username, req.Password).Scan(&id)
+	stmt, err := pool.Prepare("insert into public.user(username, password) values (?, ?)")
+	result, err := stmt.Exec(req.Username, req.Password)
+	id, err = result.LastInsertId()
 	if err != nil {
 		c.JSON(200, lib.RegisterResp{
 			StatusCode: 1,
