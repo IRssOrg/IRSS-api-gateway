@@ -11,6 +11,7 @@ import (
 
 func Auth(c *gin.Context) {
 	tokenString := c.GetHeader("Authorization")
+	log.Println("tokenString", tokenString)
 	if tokenString == "" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "Unauthorized",
