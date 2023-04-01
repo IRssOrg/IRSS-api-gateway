@@ -9,22 +9,22 @@ type User struct {
 type LoginReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Token    string `json:"token"`
 }
 
-type LoginResq struct {
+type LoginResp struct {
 	StatusCode int    `json:"statusCode"`
 	StatusMsg  string `json:"statusMsg"`
+	Token      string `json:"token"`
+	Id         int64  `json:"id"`
 }
 
 type RegisterReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Token    string `json:"token"`
 }
 
 type RegisterResp struct {
 	StatusCode int    `json:"statusCode"`
 	StatusMsg  string `json:"statusMsg"`
-	User       User   `json:"user"`
+	Id         int64  `json:"id"`
 }

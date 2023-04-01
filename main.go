@@ -3,6 +3,7 @@ package main
 import (
 	"connection-gateway/controller"
 	"github.com/gin-gonic/gin"
+	_ "github.com/lib/pq"
 	"log"
 )
 
@@ -17,6 +18,9 @@ func initRouter(r *gin.Engine) {
 
 func main() {
 	r := gin.Default()
+	if err := controller.Init(); err != nil {
+		log.Fatal(err)
+	}
 	initRouter(r)
 	if err := r.Run("0.0.0.0:11451"); err != nil {
 		log.Fatal(err)
