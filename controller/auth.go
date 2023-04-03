@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"connection-gateway/lib"
+	"connection-gateway/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -41,9 +41,9 @@ func Auth(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	var req lib.LoginReq
+	var req models.LoginReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(200, lib.LoginResp{
+		c.JSON(200, models.LoginResp{
 			StatusCode: 400,
 			StatusMsg:  "Bad Request",
 		})
@@ -58,7 +58,7 @@ func Login(c *gin.Context) {
 		return
 	}
 	if req.Password != passwordref {
-		c.JSON(200, lib.LoginResp{
+		c.JSON(200, models.LoginResp{
 			StatusCode: 1,
 			StatusMsg:  "password or username is wrong",
 		})
@@ -75,7 +75,7 @@ func Login(c *gin.Context) {
 		log.Println(err)
 		return
 	}
-	c.JSON(200, lib.LoginResp{
+	c.JSON(200, models.LoginResp{
 		StatusCode: 2,
 		StatusMsg:  "auth successfully",
 		Token:      signedToken,
@@ -86,9 +86,9 @@ func Login(c *gin.Context) {
 }
 
 func Register(c *gin.Context) {
-	var req lib.RegisterReq
+	var req models.RegisterReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(200, lib.RegisterResp{
+		c.JSON(200, models.RegisterResp{
 			StatusCode: 400,
 			StatusMsg:  "Bad Request",
 		})
@@ -98,7 +98,7 @@ func Register(c *gin.Context) {
 	var id int64
 	err := pool.QueryRow("select id from public.user where username = ?", req.Username).Scan(&id)
 	if err == nil {
-		c.JSON(200, lib.RegisterResp{
+		c.JSON(200, models.RegisterResp{
 			StatusCode: 0,
 			StatusMsg:  "username already exists",
 		})
@@ -108,14 +108,14 @@ func Register(c *gin.Context) {
 	result, err := stmt.Exec(req.Username, req.Password)
 	id, err = result.LastInsertId()
 	if err != nil {
-		c.JSON(200, lib.RegisterResp{
+		c.JSON(200, models.RegisterResp{
 			StatusCode: 1,
 			StatusMsg:  "register failed",
 		})
 		log.Println("fail to insert into database in register ", err)
 		return
 	}
-	c.JSON(200, lib.RegisterResp{
+	c.JSON(200, models.RegisterResp{
 		StatusCode: 2,
 		StatusMsg:  "register successfully",
 		Id:         id,

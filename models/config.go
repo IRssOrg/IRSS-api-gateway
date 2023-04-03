@@ -1,10 +1,11 @@
-package lib
+package models
 
 type Config struct {
 	Server struct {
 		Host string `json:"host"`
 		Port int    `json:"port"`
 	} `json:"server"`
+
 	Database struct {
 		Host         string `json:"host"`
 		Port         int    `json:"port"`

@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"connection-gateway/lib"
+	"connection-gateway/models"
 	"database/sql"
 	"encoding/json"
 	"io"
@@ -10,10 +10,7 @@ import (
 	"strconv"
 )
 
-var (
-	pool    *sql.DB
-	connStr = "root:zkw030813@tcp(101.43.168.188:3306)/public"
-)
+var pool *sql.DB
 
 func Init() error {
 	var err error
@@ -23,11 +20,11 @@ func Init() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var config lib.Config
+	var config models.Config
 	if err := json.Unmarshal(configBytes, &config); err != nil {
 		log.Fatal(err)
 	}
-	connStr = config.Database.User + ":" + config.Database.Password + "@tcp(" + config.Database.Host + ":" + strconv.Itoa(config.Database.Port) + ")/" + config.Database.DatabaseName
+	connStr := config.Database.User + ":" + config.Database.Password + "@tcp(" + config.Database.Host + ":" + strconv.Itoa(config.Database.Port) + ")/" + config.Database.DatabaseName
 	log.Println(connStr)
 	pool, err = sql.Open("mysql", connStr)
 	if err != nil {
