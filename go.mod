@@ -1,4 +1,4 @@
-module connection-gateway
+module irss-gateway
 
 go 1.19
 

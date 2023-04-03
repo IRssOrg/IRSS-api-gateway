@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"connection-gateway/models"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"irss-gateway/models"
 	"log"
 	"net/http"
 	"time"

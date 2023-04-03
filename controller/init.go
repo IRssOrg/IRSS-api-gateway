@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"connection-gateway/models"
 	"database/sql"
 	"encoding/json"
 	"io"
+	"irss-gateway/models"
 	"log"
 	"os"
 	"strconv"
