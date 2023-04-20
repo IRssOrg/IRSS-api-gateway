@@ -11,8 +11,10 @@ func initRouter(r *gin.Engine) {
 	beforeAuth.POST("/login", controller.Login)
 	beforeAuth.POST("/register", controller.Register)
 
-	apiRouter := r.Group("/connection", controller.Auth)
-	apiRouter.POST("/test")
+	apiRouter := r.Group("/subscription", controller.Auth)
+	apiRouter.POST("/:type/topics", controller.SetTopics)
+	apiRouter.GET("/:type/topics", controller.GetTopics)
+
 }
 
 func main() {

@@ -3,6 +3,8 @@ package controller
 import (
 	"database/sql"
 	"encoding/json"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"io"
 	"irss-gateway/models"
 	"log"
@@ -11,6 +13,7 @@ import (
 )
 
 var pool *sql.DB
+var db *gorm.DB
 
 func Init() error {
 	var err error
@@ -26,6 +29,7 @@ func Init() error {
 	}
 	connStr := config.Database.User + ":" + config.Database.Password + "@tcp(" + config.Database.Host + ":" + strconv.Itoa(config.Database.Port) + ")/" + config.Database.DatabaseName
 	log.Println(connStr)
+	db, err = gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	pool, err = sql.Open("mysql", connStr)
 	if err != nil {
 		return err

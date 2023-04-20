@@ -1,0 +1,39 @@
+### 注册
+POST http://127.0.0.1:11451/auth/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "xiaotong",
+  "password": "123456"
+}
+
+### 登录
+POST http://127.0.0.1:11451/auth/login
+Accept: application/json
+Content-Type: application/json
+
+{
+    "username": "xiaotong",
+    "password": "123456"
+}
+
+### set topics article
+POST http://127.0.0.1:11451/subscription/article/topics
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
+
+{
+  "topics": ["进击的巨人", "miku", "张可为"]
+}
+
+### set topics qq
+POST http://127.0.0.1:11451/subscription/qq/topics
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
+
+{
+  "topics": ["进击的巨人", "miku", "张可为"]
+}

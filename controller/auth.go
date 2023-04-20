@@ -29,6 +29,7 @@ func Auth(c *gin.Context) {
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
+	log.Println("claims", claims["userId"])
 	if !ok || !token.Valid {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "invalid token",
@@ -52,7 +53,7 @@ func Login(c *gin.Context) {
 	}
 	var passwordref string
 	var id int64
-	err := pool.QueryRow("select password, id from public.user where username = ?", req.Username).Scan(&passwordref, &id)
+	err := pool.QueryRow("select password, id from public.users where username = ?", req.Username).Scan(&passwordref, &id)
 	if err != nil {
 		log.Println("username invalid in auth ", err)
 		return
@@ -96,7 +97,7 @@ func Register(c *gin.Context) {
 		return
 	}
 	var id int64
-	err := pool.QueryRow("select id from public.user where username = ?", req.Username).Scan(&id)
+	err := pool.QueryRow("select id from public.users where username = ?", req.Username).Scan(&id)
 	if err == nil {
 		c.JSON(200, models.RegisterResp{
 			StatusCode: 0,
@@ -104,17 +105,26 @@ func Register(c *gin.Context) {
 		})
 		return
 	}
-	stmt, err := pool.Prepare("insert into public.user(username, password) values (?, ?)")
-	result, err := stmt.Exec(req.Username, req.Password)
+
+	stmt, err := pool.Prepare("insert into public.users(username, password, article_topic, qq_topic) values (?, ?, ?, ?)")
+	result, err := stmt.Exec(req.Username, req.Password, "[]", "[]")
 	id, err = result.LastInsertId()
 	if err != nil {
 		c.JSON(200, models.RegisterResp{
 			StatusCode: 1,
 			StatusMsg:  "register failed",
 		})
-		log.Println("fail to insert into database in register ", err)
+		log.Println("[Register]fail to insert into database in register ", err)
 		return
 	}
+	//user := models.User{
+	//	Username: req.Username,
+	//	Password: req.Password,
+	//}
+	//db.Table("users").Create(&user)
+	//if db.Error != nil {
+	//	log.Println("[register]mysql创建用户错误")
+	//}
 	c.JSON(200, models.RegisterResp{
 		StatusCode: 2,
 		StatusMsg:  "register successfully",
