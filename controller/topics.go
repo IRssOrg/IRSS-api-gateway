@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"github.com/gin-gonic/gin"
 	"irss-gateway/models"
 	"log"
@@ -13,10 +14,6 @@ func SetTopics(c *gin.Context) {
 	id, ok := c.Get("userId")
 	if !ok {
 		log.Println("[setArticleTopics] get userId fail")
-		c.JSON(400, models.DefaultResp{
-			StatusCode: 1,
-			StatusMsg:  "token invalid",
-		})
 		return
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -54,7 +51,36 @@ func SetTopics(c *gin.Context) {
 }
 
 func GetTopics(c *gin.Context) {
-
+	where := c.Param("type")
+	id, ok := c.Get("userId")
+	if !ok {
+		log.Println("[GetTopics] get userId fail")
+		return
+	}
+	var topicsData []byte
+	var stmt *sql.Stmt
+	var err error
+	if where == "article" {
+		stmt, err = pool.Prepare("select article_topic from public.users where id=?")
+	} else {
+		stmt, err = pool.Prepare("select qq_topic from public.users where id=?")
+	}
+	if err != nil {
+		log.Println("[GetTopics] prepare stmt fail", err)
+		return
+	}
+	err = stmt.QueryRow(id).Scan(&topicsData)
+	if topics, err := models.JsonArray2Slice(topicsData); err != nil {
+		log.Println("[GetTopics] json to slice fail", err)
+		return
+	} else {
+		c.JSON(200, models.GetTopicsResp{
+			StatusCode: 0,
+			StatusMsg:  "获取成功",
+			Topics:     topics,
+		})
+		return
+	}
 }
 
 func SetArticleTopics(id any, topics []string) error {
@@ -76,7 +102,7 @@ func SetArticleTopics(id any, topics []string) error {
 
 func SetQQTopics(id any, topics []string) error {
 	_, err := pool.Exec("update public.users set qq_topic='[]' where id=?", id)
-	stmt, err := pool.Prepare("update public.users set qq_topic=json_array_append(article_topic, '$', ?) where id=?")
+	stmt, err := pool.Prepare("update public.users set qq_topic=json_array_append(qq_topic, '$', ?) where id=?")
 	if err != nil {
 		log.Println("[setQQTopic] prepare stmt fail", err)
 		return err

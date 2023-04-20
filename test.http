@@ -37,3 +37,9 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVz
 {
   "topics": ["进击的巨人", "miku", "张可为"]
 }
+
+
+### get topics
+GET http://127.0.0.1:11451/subscription/article/topics
+Accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
