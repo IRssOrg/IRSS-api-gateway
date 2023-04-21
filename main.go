@@ -14,6 +14,7 @@ func initRouter(r *gin.Engine) {
 	apiRouter := r.Group("/subscription", controller.Auth)
 	apiRouter.POST("/:type/topics", controller.SetTopics)
 	apiRouter.GET("/:type/topics", controller.GetTopics)
+	apiRouter.POST("/account", controller.SetAccount)
 
 }
 

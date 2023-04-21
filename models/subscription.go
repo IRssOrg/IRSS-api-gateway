@@ -14,3 +14,10 @@ type GetTopicsResp struct {
 	StatusMsg  string `json:"statusMsg"`
 	Topics     []string
 }
+
+type SetAccountReq struct {
+	Zhihu    string `json:"zhihu"`
+	Qq       string `json:"qq"`
+	Bilibili string `json:"bilibili"`
+	Wechat   string `json:"wechat"`
+}

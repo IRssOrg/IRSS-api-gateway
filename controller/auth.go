@@ -69,7 +69,7 @@ func Login(c *gin.Context) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": req.Username,
 		"userId":   id,
-		"exp":      time.Now().Add(time.Hour * 24).Unix(),
+		"exp":      time.Now().Add(time.Hour * 720).Unix(), //todo 为了测试方便，暂时设置为一个token有效期为30天
 	})
 	signedToken, err := token.SignedString([]byte("secret"))
 	if err != nil {

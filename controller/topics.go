@@ -2,6 +2,7 @@ package controller
 
 import (
 	"database/sql"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"irss-gateway/models"
 	"log"
@@ -25,24 +26,12 @@ func SetTopics(c *gin.Context) {
 		return
 	}
 	topics := req.Topics
-	if where == "article" {
-		if err := SetArticleTopics(id, topics); err != nil {
-			c.JSON(400, models.DefaultResp{
-				StatusCode: 1,
-				StatusMsg:  "设置失败",
-			})
-			return
-		}
-
-	} else {
-		if err := SetQQTopics(id, topics); err != nil {
-			c.JSON(400, models.DefaultResp{
-				StatusCode: 1,
-				StatusMsg:  "设置失败",
-			})
-			return
-		}
+	err := RecordTopics(id, topics, where)
+	if err != nil {
+		log.Println("[setArticleTopics] prepare stmt fail", err)
+		return
 	}
+
 	c.JSON(200, models.DefaultResp{
 		StatusCode: 0,
 		StatusMsg:  "设置成功",
@@ -83,36 +72,21 @@ func GetTopics(c *gin.Context) {
 	}
 }
 
-func SetArticleTopics(id any, topics []string) error {
-	_, err := pool.Exec("update public.users set article_topic='[]' where id=?", id)
-	stmt, err := pool.Prepare("update public.users set article_topic=json_array_append(article_topic, '$', ?) where id=?")
+func RecordTopics(id any, topics []string, where string) error {
+	jsonArray, err := json.Marshal(topics)
 	if err != nil {
-		log.Println("[setArticleTopic] prepare stmt fail", err)
+		log.Println("[setArticleTopic] json marshal fail", err)
 		return err
 	}
-	for _, topic := range topics {
-		_, err := stmt.Exec(topic, id)
-		if err != nil {
-			log.Println("[setArticleTopic] exec stmt fail", err)
-			return err
-		}
+	print(string(jsonArray))
+	if where == "article" {
+		_, err = pool.Exec("update public.users set article_topic=? where id=?", string(jsonArray), id)
+	} else {
+		_, err = pool.Exec("update public.users set qq_topic=? where id=?", string(jsonArray), id)
 	}
-	return nil
-}
-
-func SetQQTopics(id any, topics []string) error {
-	_, err := pool.Exec("update public.users set qq_topic='[]' where id=?", id)
-	stmt, err := pool.Prepare("update public.users set qq_topic=json_array_append(qq_topic, '$', ?) where id=?")
 	if err != nil {
-		log.Println("[setQQTopic] prepare stmt fail", err)
+		log.Println("[setArticleTopic] exec stmt fail", err)
 		return err
-	}
-	for _, topic := range topics {
-		_, err := stmt.Exec(topic, id)
-		if err != nil {
-			log.Println("[setQQTopic] exec stmt fail", err)
-			return err
-		}
 	}
 	return nil
 }

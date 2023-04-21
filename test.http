@@ -22,10 +22,10 @@ Content-Type: application/json
 POST http://127.0.0.1:11451/subscription/article/topics
 Accept: application/json
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIxNjc4NDAsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.xccR1Zxq5apFjUyc0I41FV_E8p0kitMFySwV0x0lQ5w
 
 {
-  "topics": ["进击的巨人", "miku", "张可为"]
+  "topics": ["进击的巨人", "miku", "张可为", "xiaotong"]
 }
 
 ### set topics qq
@@ -43,3 +43,17 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVz
 GET http://127.0.0.1:11451/subscription/article/topics
 Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
+
+
+### set account
+POST http://127.0.0.1:11451/subscription/account
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
+
+{
+  "zhihu" : "xiaotong",
+  "bilibili" : "xiaotong",
+  "qq" : "xiaotong",
+  "wechat": "xiaotong"
+}
