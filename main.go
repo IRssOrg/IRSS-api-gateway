@@ -15,6 +15,8 @@ func initRouter(r *gin.Engine) {
 	apiRouter.POST("/:type/topics", controller.SetTopics)
 	apiRouter.GET("/:type/topics", controller.GetTopics)
 	apiRouter.POST("/account", controller.SetAccount)
+	apiRouter.POST("/config", controller.SetConfig)
+	apiRouter.GET("/ws", controller.WsHandler, controller.SubscriptionTimer)
 
 }
 

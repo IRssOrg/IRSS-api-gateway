@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"irss-gateway/models"
 	"log"
 	"net/http"
@@ -21,6 +21,7 @@ func Auth(c *gin.Context) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte("secret"), nil
 	})
+
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "invalid token",
@@ -36,7 +37,8 @@ func Auth(c *gin.Context) {
 		})
 		return
 	}
-	c.Set("userId", claims["userId"])
+	id := int(claims["userId"].(float64))
+	c.Set("userId", id)
 	c.Set("username", claims["username"])
 	c.Next()
 }
@@ -68,7 +70,7 @@ func Login(c *gin.Context) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": req.Username,
-		"userId":   id,
+		"sub":      id,
 		"exp":      time.Now().Add(time.Hour * 720).Unix(), //todo 为了测试方便，暂时设置为一个token有效期为30天
 	})
 	signedToken, err := token.SignedString([]byte("secret"))

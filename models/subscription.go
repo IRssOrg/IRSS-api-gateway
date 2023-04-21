@@ -21,3 +21,9 @@ type SetAccountReq struct {
 	Bilibili string `json:"bilibili"`
 	Wechat   string `json:"wechat"`
 }
+
+type UserConfig struct {
+	ArticleTime int `json:"articleTime"`
+	MessageTime int `json:"messageTime"`
+	VideoTime   int `json:"videoTime"`
+}

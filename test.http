@@ -57,3 +57,22 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVz
   "qq" : "xiaotong",
   "wechat": "xiaotong"
 }
+
+
+### set user config
+POST http://127.0.0.1:11451/subscription/config
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
+
+{
+  "articleTime": 600,
+  "messageTime": 600,
+  "videoTime": 600
+}
+
+### upgrade to ws
+GET http://127.0.0.1:11451/subscription/ws
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
