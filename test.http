@@ -115,3 +115,14 @@ Content-Type: application/json
 {
   "ids": ["6"]
 }
+
+
+### search author
+POST http://127.0.0.1:11451/info/subscription/author/zhihu
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "username": "以沫"
+}

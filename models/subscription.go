@@ -13,6 +13,10 @@ type SelectedTopics struct {
 	Ids []string `json:"ids"`
 }
 
+type SearchAuthor struct {
+	Question string `json:"question"`
+}
+
 type TopicsResp struct {
 	Topics     []Topic `json:"topics"`
 	StatusCode int     `json:"statusCode"`

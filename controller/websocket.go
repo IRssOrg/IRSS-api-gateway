@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"irss-gateway/models"
 	"log"
@@ -17,6 +18,12 @@ var (
 	}
 	mutex = &sync.Mutex{}
 )
+
+type UserSubLIst struct {
+	Zhihu    []Author `json:"zhihu"`
+	Wechat   []Author `json:"wechat"`
+	Bilibili []Author `json:"bilibili"`
+}
 
 func WsHandler(c *gin.Context) {
 	idCode, ok := c.Get("id")
@@ -45,6 +52,7 @@ func WsHandler(c *gin.Context) {
 	mutex.Lock()
 	delete(wsPool, id)
 	mutex.Unlock()
+	c.Next()
 }
 
 func SubscriptionTimer(c *gin.Context) {
@@ -55,12 +63,16 @@ func SubscriptionTimer(c *gin.Context) {
 	}
 	id := idCode.(int)
 	config, err := GetUserConfig(int64(id))
+	subList, err := GetUserSubscription(int64(id))
 	if err != nil {
 		log.Println("[SubscriptionTimer] get user config fail", err)
 		return
 	}
 	go func(id int) { // article timer
 		for {
+			//for _, v := range subList.Zhihu {
+			//
+			//}
 			time.Sleep(time.Second * time.Duration(config.ArticleTime))
 		}
 	}(id)
@@ -69,11 +81,7 @@ func SubscriptionTimer(c *gin.Context) {
 			time.Sleep(time.Second * time.Duration(config.MessageTime))
 		}
 	}(id)
-	go func(id int) { // video timer
-		for {
-			time.Sleep(time.Second * time.Duration(config.VideoTime))
-		}
-	}(id)
+
 }
 
 func GetUserConfig(id int64) (models.UserConfig, error) {
@@ -85,4 +93,23 @@ func GetUserConfig(id int64) (models.UserConfig, error) {
 		return config, err
 	}
 	return config, nil
+}
+
+func GetUserSubscription(id int64) (UserSubLIst, error) {
+	log.Println("[GetUserSubscription] running id:", id)
+	var subList UserSubLIst
+	var zhihuByte, wechatByte, bilibiliByte []byte
+	err := pool.QueryRow("select zhihu_sub,wechat_sub,bilibili_sub from public.users where id=?", id).Scan(&zhihuByte, &wechatByte, &bilibiliByte)
+	if err != nil {
+		log.Println("[GetUserSubscription] query fail", err)
+		return subList, err
+	}
+	err = json.Unmarshal(zhihuByte, &subList.Zhihu)
+	err = json.Unmarshal(wechatByte, &subList.Wechat)
+	err = json.Unmarshal(bilibiliByte, &subList.Bilibili)
+	if err != nil {
+		log.Println("[GetUserSubscription] query fail", err)
+		return subList, err
+	}
+	return subList, nil
 }

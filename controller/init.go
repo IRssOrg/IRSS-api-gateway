@@ -14,6 +14,7 @@ import (
 
 var pool *sql.DB
 var db *gorm.DB
+var config models.Config
 
 func Init() error {
 	var err error
@@ -23,7 +24,7 @@ func Init() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var config models.Config
+
 	if err := json.Unmarshal(configBytes, &config); err != nil {
 		log.Fatal(err)
 	}
