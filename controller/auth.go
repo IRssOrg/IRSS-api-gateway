@@ -110,8 +110,8 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	stmt, err := pool.Prepare("insert into public.users(username, password, article_topic, qq_topic, qq, selected_topic) values (?, ?, ?, ?, ?, ?)")
-	result, err := stmt.Exec(req.Username, req.Password, "[]", "[]", "{\"accounts\":[]}", "[]")
+	stmt, err := pool.Prepare("insert into public.users(username, password, article_topic, qq_topic, qq, selected_topic, wechat_sub, zhihu_sub, bilibili_sub) values (?, ?, ?, ?, ?, ?)")
+	result, err := stmt.Exec(req.Username, req.Password, "[]", "[]", "{\"accounts\":[]}", "[]", "[]", "[]", "[]")
 	id, err = result.LastInsertId()
 	if err != nil {
 		c.JSON(200, models.RegisterResp{
@@ -126,14 +126,7 @@ func Register(c *gin.Context) {
 		log.Println("[Register]fail to create table in register ", err)
 		return
 	}
-	//user := models.User{
-	//	Username: req.Username,
-	//	Password: req.Password,
-	//}
-	//db.Table("users").Create(&user)
-	//if db.Error != nil {
-	//	log.Println("[register]mysql创建用户错误")
-	//}
+
 	c.JSON(200, models.RegisterResp{
 		StatusCode: 2,
 		StatusMsg:  "register successfully",

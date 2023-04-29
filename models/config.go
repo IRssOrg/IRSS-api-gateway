@@ -16,4 +16,9 @@ type Config struct {
 	QQTopics struct {
 		Topics []string `json:"topics"`
 	}
+	Spider struct {
+		Zhihu    string `json:"zhihu"`
+		Wechat   string `json:"wechat"`
+		Bilibili string `json:"bilibili"`
+	}
 }

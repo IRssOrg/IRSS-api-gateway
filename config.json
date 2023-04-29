@@ -12,5 +12,10 @@
     },
     "QQtopics": {
         "topics": ["vocaloid1", "vocaloid2"]
+    },
+    "Spider": {
+        "zhihu": "http://127.0.0.1:8000",
+        "wechat": "",
+        "bilibili": ""
     }
 }

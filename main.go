@@ -20,8 +20,13 @@ func initRouter(r *gin.Engine) {
 	apiRouter.POST("/config", controller.SetConfig)
 	apiRouter.GET("/ws", controller.WsHandler, controller.SubscriptionTimer)
 
+	apiRouter.POST("/subscription/author/:platform", controller.SearchAuthor)
+	apiRouter.POST("/subscription/author/:platform/subscribed", controller.AddSubscription)
+	apiRouter.DELETE("/subscription/author/:platform/subscribed", controller.DeleteSubscription)
+
 	r.GET("/account", controller.Auth, controller.GetAccount)
 	r.POST("/account", controller.Auth, controller.AddAccount)
+
 }
 
 func main() {
