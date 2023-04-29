@@ -9,7 +9,7 @@ import (
 func initRouter(r *gin.Engine) {
 	beforeAuth := r.Group("/auth")
 	beforeAuth.POST("/login", controller.Login)
-	beforeAuth.POST("/register", controller.Register, controller.SubscriptionTimer)
+	beforeAuth.POST("/register", controller.Register)
 
 	apiRouter := r.Group("/info", controller.Auth)
 	apiRouter.PATCH("/:type/topics/selected", controller.AddTopics)
