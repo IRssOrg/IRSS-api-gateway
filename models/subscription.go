@@ -33,7 +33,7 @@ type GetTopicsResp struct {
 }
 
 type UserConfig struct {
-	ArticleTime int `json:"articleTime"`
-	MessageTime int `json:"messageTime"`
-	VideoTime   int `json:"videoTime"`
+	ArticleTime string `json:"articleTime"`
+	MessageTime string `json:"messageTime"`
+	VideoTime   string `json:"videoTime"`
 }

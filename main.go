@@ -9,7 +9,7 @@ import (
 func initRouter(r *gin.Engine) {
 	beforeAuth := r.Group("/auth")
 	beforeAuth.POST("/login", controller.Login)
-	beforeAuth.POST("/register", controller.Register)
+	beforeAuth.POST("/register", controller.Register, controller.SubscriptionTimer)
 
 	apiRouter := r.Group("/info", controller.Auth)
 	apiRouter.PATCH("/:type/topics/selected", controller.AddTopics)
@@ -18,7 +18,7 @@ func initRouter(r *gin.Engine) {
 	//apiRouter.DELETE("/:type/topics/selected", controller.DeleteTopics)
 	apiRouter.GET("/:type/topics", controller.GetTopics)
 	apiRouter.POST("/config", controller.SetConfig)
-	apiRouter.GET("/ws", controller.WsHandler, controller.SubscriptionTimer)
+	apiRouter.GET("/ws", controller.WsHandler)
 
 	apiRouter.POST("/subscription/author/:platform", controller.SearchAuthor)
 	apiRouter.POST("/subscription/author/:platform/subscribed", controller.AddSubscription)

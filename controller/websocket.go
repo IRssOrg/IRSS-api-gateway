@@ -6,7 +6,6 @@ import (
 	"irss-gateway/models"
 	"log"
 	"sync"
-	"time"
 )
 import "github.com/gorilla/websocket"
 
@@ -19,10 +18,13 @@ var (
 	mutex = &sync.Mutex{}
 )
 
-type UserSubLIst struct {
+type UserSubList struct {
 	Zhihu    []Author `json:"zhihu"`
 	Wechat   []Author `json:"wechat"`
 	Bilibili []Author `json:"bilibili"`
+}
+
+type LastUpdateTime struct {
 }
 
 func WsHandler(c *gin.Context) {
@@ -55,35 +57,6 @@ func WsHandler(c *gin.Context) {
 	c.Next()
 }
 
-func SubscriptionTimer(c *gin.Context) {
-	log.Println("[SubscriptionTimer] running")
-	idCode, ok := c.Get("id")
-	if !ok {
-		return
-	}
-	id := idCode.(int)
-	config, err := GetUserConfig(int64(id))
-	subList, err := GetUserSubscription(int64(id))
-	if err != nil {
-		log.Println("[SubscriptionTimer] get user config fail", err)
-		return
-	}
-	go func(id int) { // article timer
-		for {
-			//for _, v := range subList.Zhihu {
-			//
-			//}
-			time.Sleep(time.Second * time.Duration(config.ArticleTime))
-		}
-	}(id)
-	go func(id int) { // message timer
-		for {
-			time.Sleep(time.Second * time.Duration(config.MessageTime))
-		}
-	}(id)
-
-}
-
 func GetUserConfig(id int64) (models.UserConfig, error) {
 	log.Println("[GetUserConfig] running id:", id)
 	var config models.UserConfig
@@ -95,9 +68,9 @@ func GetUserConfig(id int64) (models.UserConfig, error) {
 	return config, nil
 }
 
-func GetUserSubscription(id int64) (UserSubLIst, error) {
+func GetUserSubscription(id int64) (UserSubList, error) {
 	log.Println("[GetUserSubscription] running id:", id)
-	var subList UserSubLIst
+	var subList UserSubList
 	var zhihuByte, wechatByte, bilibiliByte []byte
 	err := pool.QueryRow("select zhihu_sub,wechat_sub,bilibili_sub from public.users where id=?", id).Scan(&zhihuByte, &wechatByte, &bilibiliByte)
 	if err != nil {

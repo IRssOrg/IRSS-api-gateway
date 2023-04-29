@@ -126,11 +126,16 @@ func Register(c *gin.Context) {
 		log.Println("[Register]fail to create table in register ", err)
 		return
 	}
+	if err := SubscriptionTimer(id); err != nil {
+		log.Println("[Register]fail to create timer in register ", err)
+		return
+	}
 
 	c.JSON(200, models.RegisterResp{
 		StatusCode: 2,
 		StatusMsg:  "register successfully",
 		Id:         id,
 	})
+
 	return
 }
