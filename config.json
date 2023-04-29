@@ -1,21 +1,29 @@
 {
-    "database": {
-        "host": "101.43.168.188",
-        "port": 3306,
-        "user": "root",
-        "password": "zkw030813",
-        "database_name": "public"
-    },
-    "server": {
-        "host": "localhost",
-        "port": 11451
-    },
-    "QQtopics": {
-        "topics": ["vocaloid1", "vocaloid2"]
-    },
-    "Spider": {
-        "zhihu": "http://127.0.0.1:8000",
-        "wechat": "",
-        "bilibili": ""
-    }
+  "database": {
+    "host": "101.43.168.188",
+    "port": 3306,
+    "user": "root",
+    "password": "zkw030813",
+    "database_name": "public"
+  },
+  "server": {
+    "host": "localhost",
+    "port": 11451
+  },
+  "qq_topics": {
+    "topics": [
+      "vocaloid1",
+      "vocaloid2"
+    ]
+  },
+  "spider": {
+    "zhihu": "http://127.0.0.1:8000",
+    "wechat": "",
+    "bilibili": ""
+  },
+  "processor": {
+    "qq_summary": "",
+    "topic_processor": ""
+  },
+  "gpt_token": ""
 }
