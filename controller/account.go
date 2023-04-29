@@ -1,18 +1,21 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"irss-gateway/models"
 	"log"
 )
 
-func SetAccount(c *gin.Context) {
-	id, ok := c.Get("userId")
+func AddAccount(c *gin.Context) {
+	idCode, ok := c.Get("userId")
 	if !ok {
 		log.Println("[SetAccount] get userId fail")
 		return
 	}
-	var req models.SetAccountReq
+	log.Println(idCode)
+	id := idCode.(int)
+	var req models.AddAccountReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("[SetAccount] read json fail", err)
 		c.JSON(400, models.DefaultResp{
@@ -21,19 +24,54 @@ func SetAccount(c *gin.Context) {
 		})
 		return
 	}
-	stmt, err := pool.Prepare("update public.users set zhihu=?,bilibili=?,wechat=?,qq=? where id=?")
+
+	var accountByte []byte
+	err := pool.QueryRow("select qq from public.users where id=?", id).Scan(&accountByte)
 	if err != nil {
-		log.Println("[SetAccount] prepare stmt fail", err)
+		log.Println("[SetAccount] query fail", err)
 		return
 	}
-	_, err = stmt.Exec(req.Zhihu, req.Bilibili, req.Wechat, req.Qq, id)
+	var accounts models.Accounts
+	err = json.Unmarshal(accountByte, &accounts)
+	log.Println(string(accountByte))
 	if err != nil {
-		log.Println("[SetAccount] exec fail", err)
+		log.Println("[SetAccount] unmarshal fail", err)
+		return
+	}
+	accounts.Accounts = append(accounts.Accounts, req)
+	accountByte, err = json.Marshal(accounts)
+	_, err = pool.Exec("update public.users set qq=? where id=?", string(accountByte), id)
+	if err != nil {
+		log.Println("[SetAccount] update fail", err)
 		return
 	}
 	c.JSON(200, models.DefaultResp{
 		StatusCode: 0,
-		StatusMsg:  "设置成功",
+		StatusMsg:  "添加成功",
 	})
+	return
+}
+
+func GetAccount(c *gin.Context) {
+	idCode, ok := c.Get("userId")
+	if !ok {
+		log.Println("[GetAccount] get userId fail")
+		return
+	}
+	id := idCode.(int)
+	var accountByte []byte
+	err := pool.QueryRow("select qq from public.users where id=?", id).Scan(&accountByte)
+	log.Println(string(accountByte))
+	if err != nil {
+		log.Println("[GetAccount] query fail", err)
+		return
+	}
+	var accounts models.Accounts
+	err = json.Unmarshal(accountByte, &accounts)
+	if err != nil {
+		log.Println("[GetAccount] unmarshal fail", err)
+		return
+	}
+	c.JSON(200, accounts)
 	return
 }

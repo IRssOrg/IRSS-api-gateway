@@ -9,5 +9,8 @@
     "server": {
         "host": "localhost",
         "port": 11451
+    },
+    "QQtopics": {
+        "topics": ["vocaloid1", "vocaloid2"]
     }
 }

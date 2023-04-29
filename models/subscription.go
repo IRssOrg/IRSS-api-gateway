@@ -1,25 +1,31 @@
 package models
 
-type SetTopicsReq struct {
-	Topics []string `json:"topics"`
+type AddTopicsReq struct {
+	Topic string `json:"topic"`
 }
 
+type Topic struct {
+	Topic string `json:"topic"`
+	Id    string `json:"id"`
+}
+
+type SelectedTopics struct {
+	Ids []string `json:"ids"`
+}
+
+type TopicsResp struct {
+	Topics     []Topic `json:"topics"`
+	StatusCode int     `json:"statusCode"`
+}
 type DefaultResp struct {
 	StatusCode int    `json:"statusCode"`
 	StatusMsg  string `json:"statusMsg"`
 }
 
 type GetTopicsResp struct {
-	StatusCode int    `json:"statusCode"`
-	StatusMsg  string `json:"statusMsg"`
-	Topics     []string
-}
-
-type SetAccountReq struct {
-	Zhihu    string `json:"zhihu"`
-	Qq       string `json:"qq"`
-	Bilibili string `json:"bilibili"`
-	Wechat   string `json:"wechat"`
+	StatusCode int      `json:"statusCode"`
+	StatusMsg  string   `json:"statusMsg"`
+	Topics     []string `json:"topics"`
 }
 
 type UserConfig struct {

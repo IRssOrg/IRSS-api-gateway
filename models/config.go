@@ -13,4 +13,7 @@ type Config struct {
 		Password     string `json:"password"`
 		DatabaseName string `json:"database_name"`
 	} `json:"database"`
+	QQTopics struct {
+		Topics []string `json:"topics"`
+	}
 }

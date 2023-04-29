@@ -6,6 +6,7 @@ import (
 	"irss-gateway/models"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -30,7 +31,7 @@ func Auth(c *gin.Context) {
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
-	log.Println("claims", claims["userId"])
+	log.Println("claims", claims)
 	if !ok || !token.Valid {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "invalid token",
@@ -38,6 +39,7 @@ func Auth(c *gin.Context) {
 		return
 	}
 	id := int(claims["userId"].(float64))
+	log.Println(id)
 	c.Set("userId", id)
 	c.Set("username", claims["username"])
 	c.Next()
@@ -70,7 +72,7 @@ func Login(c *gin.Context) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": req.Username,
-		"sub":      id,
+		"userId":   id,
 		"exp":      time.Now().Add(time.Hour * 720).Unix(), //todo 为了测试方便，暂时设置为一个token有效期为30天
 	})
 	signedToken, err := token.SignedString([]byte("secret"))
@@ -108,8 +110,8 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	stmt, err := pool.Prepare("insert into public.users(username, password, article_topic, qq_topic) values (?, ?, ?, ?)")
-	result, err := stmt.Exec(req.Username, req.Password, "[]", "[]")
+	stmt, err := pool.Prepare("insert into public.users(username, password, article_topic, qq_topic, qq, selected_topic) values (?, ?, ?, ?, ?, ?)")
+	result, err := stmt.Exec(req.Username, req.Password, "[]", "[]", "{\"accounts\":[]}", "[]")
 	id, err = result.LastInsertId()
 	if err != nil {
 		c.JSON(200, models.RegisterResp{
@@ -117,6 +119,11 @@ func Register(c *gin.Context) {
 			StatusMsg:  "register failed",
 		})
 		log.Println("[Register]fail to insert into database in register ", err)
+		return
+	}
+	_, err = pool.Exec("CREATE TABLE " + strconv.Itoa(int(id)) + "_article" + " (id bigint NOT NULL AUTO_INCREMENT,  content varchar(1000) NULL,  time varchar(255) NULL, media_type varchar(255) NULL,  topic varchar(255) NULL,  PRIMARY KEY (id));")
+	if err != nil {
+		log.Println("[Register]fail to create table in register ", err)
 		return
 	}
 	//user := models.User{
