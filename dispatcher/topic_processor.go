@@ -9,7 +9,8 @@ import (
 )
 
 var config models.Config
-var url = config.Processor.QQSummary
+var QQUrl = config.Processor.QQSummary
+var PassageUrl = config.Processor.TopicProcessor
 var token = config.Token
 
 // UploadPassage /*
@@ -26,7 +27,7 @@ func UploadPassage(content string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := http.Post(url+"/passage", "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(PassageUrl+"/passage", "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return "", err
 	}
@@ -49,7 +50,7 @@ func AskQuestion(hash string, question string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := http.Post(url+"/passage/"+hash, "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(QQUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return "", err
 	}
@@ -71,7 +72,7 @@ func Summary(hash string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := http.Post(url+"/passage/"+hash, "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(QQUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return "", err
 	}
@@ -93,7 +94,7 @@ func GetPassageTopics(hash string) ([]models.TopicWithRelative, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := http.Post(url+"/passage/"+hash, "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(QQUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +117,7 @@ func ConfirmTopicWithRelative(hash string, topic string) ([]models.TopicWithRela
 	if err != nil {
 		return nil, err
 	}
-	resp, err := http.Post(url+"/passage/"+hash, "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(PassageUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return nil, err
 	}
