@@ -19,7 +19,7 @@
   "spider": {
     "zhihu": "http://127.0.0.1:8000",
     "wechat": "http://127.0.0.1:8001",
-    "bilibili": ""
+    "bilibili": "http://127.0.0.1:8002"
   },
   "processor": {
     "qq_summary": "",

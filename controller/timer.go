@@ -3,11 +3,11 @@ package controller
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"irss-gateway/dispatcher"
 	"irss-gateway/models"
 	"log"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 )
 import "github.com/robfig/cron/v3"
@@ -46,19 +46,23 @@ type Article struct {
 
 var UserConfigMap = make(map[int64]models.UserConfig) //map剂的使用make函数初始化
 var UserSubListMap = make(map[int64]UserSubList)
+var UserTopics = make(map[int64][]string)
 var Timers = make(map[int64]*cron.Cron)
 var LastUpdateTimeMap = make(map[int64]timeList)
-var waitGroup sync.WaitGroup
+
+//var waitGroup sync.WaitGroup
 
 func SubscriptionTimer(id int64) error {
 	config, err := GetUserConfig(id)
 	subList, err := GetUserSubscription(id)
+	topics, err := GetTopicsList(id)
 	if err != nil {
 		log.Println("[SubscriptionTimer] get user config fail", err)
 		return err
 	}
 	UserConfigMap[id] = config
 	UserSubListMap[id] = subList
+	UserTopics[id] = topics
 	if err != nil {
 		log.Println("[SubscriptionTimer] get user config fail", err)
 		return err
@@ -93,7 +97,6 @@ func SubscriptionTimer(id int64) error {
 				log.Println("[SubscriptionTimer] get zhihu author fail", err)
 				continue
 			}
-			//log.Println(resp)
 			for _, v := range resp {
 				article, err := SearchPassage(strconv.Itoa(int(v.Id)), "zhihu")
 				if err != nil {
@@ -101,9 +104,23 @@ func SubscriptionTimer(id int64) error {
 					continue
 				}
 				article.Time = v.Time
-				LastId, err := StoreArticle(id, article, ok)
-				article.Id = string(LastId)
-				pushEvent = append(pushEvent, article)
+				hash, err := dispatcher.UploadPassage(article.Content)
+				topicString, err := GetTopicString(id)
+				relatives, err := dispatcher.ConfirmTopicWithRelative(hash, topicString)
+				for _, v := range relatives {
+					rel, err := strconv.ParseFloat(v.Relative, 64)
+					if err != nil {
+						log.Println("[SubscriptionTimer] parse relative fail", err)
+						continue
+					}
+					if rel > 0.5 {
+						LastId, _ := StoreArticle(id, article, ok)
+						article.Id = string(LastId)
+						article.Topic = v.Topic
+						pushEvent = append(pushEvent, article)
+					}
+				}
+
 			}
 		}
 		if ok {

@@ -107,6 +107,34 @@ func GetTopics(c *gin.Context) {
 
 }
 
+func GetTopicsList(id int64) ([]string, error) {
+	var topicByte []byte
+	err := pool.QueryRow("select article_topic from public.users where id=?", id).Scan(&topicByte)
+	if err != nil {
+		log.Println("[GetTopics] query fail", err)
+		return nil, err
+	}
+	var topics []string
+	err = json.Unmarshal(topicByte, &topics)
+	if err != nil {
+		log.Println("[GetTopics] unmarshal fail", err)
+		return nil, err
+	}
+	return topics, nil
+}
+
+func GetTopicString(id int64) (string, error) {
+	topics, err := GetTopicsList(id)
+	if err != nil {
+		return "", err
+	}
+	var topicString string
+	for _, v := range topics {
+		topicString += v + ","
+	}
+	return topicString, nil
+}
+
 func GetSelectedTopics(c *gin.Context) {
 	idCode, ok := c.Get("userId")
 	if !ok {

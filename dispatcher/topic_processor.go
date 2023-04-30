@@ -109,6 +109,7 @@ func GetPassageTopics(hash string) ([]models.TopicWithRelative, error) {
 func ConfirmTopicWithRelative(hash string, topic string) ([]models.TopicWithRelative, error) {
 	body := models.TopicActionReq{
 		Action: "getTopicRelative",
+		Param:  topic,
 		Token:  token,
 	}
 	byte, err := json.Marshal(body)
