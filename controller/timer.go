@@ -6,6 +6,7 @@ import (
 	"irss-gateway/models"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -80,6 +81,9 @@ func SubscriptionTimer(id int64) error {
 			timeRef.Zhihu = time.Now().Unix()
 			timeRef.Wechat = time.Now().Unix()
 			timeRef.Bilibili = time.Now().Unix()
+			//timeRef.Zhihu = 100000000
+			//timeRef.Wechat = 100000000
+			//timeRef.Bilibili = 10000000
 		}
 		log.Println(timeRef)
 		conn, ok := wsPool[int(id)]
@@ -92,9 +96,9 @@ func SubscriptionTimer(id int64) error {
 				log.Println("[SubscriptionTimer] get zhihu author fail", err)
 				continue
 			}
-			log.Println("[SubscriptionTimer] get zhihu author success")
+			log.Println(resp)
 			for _, v := range resp {
-				article, err := SearchPassage(string(v.Id), "zhihu")
+				article, err := SearchPassage(strconv.Itoa(int(v.Id)), "zhihu")
 				if err != nil {
 					log.Println("[SubscriptionTimer] get zhihu article fail", err)
 					continue
@@ -118,11 +122,40 @@ func SubscriptionTimer(id int64) error {
 	})
 	cronObj.Start()
 	log.Println("[SubscriptionTimer] cron start")
-	//time.Sleep(time.Hour * 72)
+	time.Sleep(time.Hour * 72)
 	return nil
 }
 
 func pushArticleNow(id int64) error {
+	var articleList []ArticleResp
+	rows, err := pool.Query("select id, content, time, media_type, topic, platform from " + strconv.Itoa(int(id)) + "_article where checked=0")
+	if err != nil {
+		log.Println("[pushArticleNow] query fail", err)
+		return err
+	}
+
+	for rows.Next() {
+		var article ArticleResp
+		err := rows.Scan(&article.Id, &article.Content, &article.Time, &article.MediaType, &article.Topic, &article.Platform)
+		if err != nil {
+			log.Println("[pushArticleNow] scan fail", err)
+			return err
+		}
+		articleList = append(articleList, article)
+	}
+	_, err = pool.Exec("update " + strconv.Itoa(int(id)) + "_article set checked=1 where checked=0")
+	conn, ok := wsPool[int(id)]
+	if !ok {
+		log.Println("[pushArticleNow] conn not exist")
+		return nil
+	}
+	if err := conn.WriteJSON(gin.H{
+		"event":    "article notification",
+		"articles": articleList,
+	}); err != nil {
+		log.Println("[pushArticleNow] push article fail", err)
+		return err
+	}
 	return nil
 }
 
@@ -136,12 +169,14 @@ func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error
 	case "wechat":
 		url = config.Spider.Wechat + "/api/passages/" + id + "/0"
 	}
+	log.Println(url)
 	resp, err := http.Get(url)
 	var respList passageResp
 	if err != nil {
 		return respList.Ret, err
 	}
-	err = json.NewDecoder(resp.Body).Decode(&resp)
+	err = json.NewDecoder(resp.Body).Decode(&respList)
+	log.Println(respList.Ret)
 	defer resp.Body.Close()
 	if err != nil {
 		return respList.Ret, err
@@ -189,8 +224,9 @@ func StoreArticle(id int64, article ArticleResp, checked bool) (int64, error) {
 	if checked {
 		isChecked = 1
 	}
-	result, err := pool.Exec("INSERT INTO article (id, platform, media_type, content, topic, checked) VALUES (?, ?, ?, ?, ?, ?)", id, article.Platform, article.MediaType, article.Content, article.Topic, isChecked)
+	result, err := pool.Exec("INSERT INTO "+strconv.Itoa(int(id))+"_article (platform, media_type, content, topic, checked, time) VALUES (?, ?, ?, ?, ?, ?)", article.Platform, article.MediaType, article.Content, article.Topic, isChecked, article.Time)
 	if err != nil {
+		log.Println("[StoreArticle] store article fail", err)
 		return 0, err
 	}
 	lastId, err := result.LastInsertId()

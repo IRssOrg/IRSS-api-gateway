@@ -122,7 +122,7 @@ func Register(c *gin.Context) {
 		log.Println("[Register]fail to insert into database in register ", err)
 		return
 	}
-	_, err = pool.Exec("CREATE TABLE " + strconv.Itoa(int(id)) + "_article" + " (id bigint NOT NULL AUTO_INCREMENT,  content varchar(1000) NULL,  time varchar(255) NULL, media_type varchar(255) NULL,  topic varchar(255) NULL,  PRIMARY KEY (id), checked int NULL, platform varchar(255) NULL);")
+	_, err = pool.Exec("CREATE TABLE " + strconv.Itoa(int(id)) + "_article" + " (id bigint NOT NULL AUTO_INCREMENT,  content varchar(6000) NULL,  time varchar(255) NULL, media_type varchar(255) NULL,  topic varchar(255) NULL,  PRIMARY KEY (id), checked int NULL, platform varchar(255) NULL);")
 	if err != nil {
 		log.Println("[Register]fail to create table in register ", err)
 		return
