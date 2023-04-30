@@ -166,6 +166,9 @@ func SetTopics(c *gin.Context) {
 		log.Println("[setArticleTopic] exec stmt fail", err)
 		return
 	}
+	go func() {
+		_ = SubscriptionTimer(int64(id))
+	}()
 	c.JSON(200, req)
 
 }

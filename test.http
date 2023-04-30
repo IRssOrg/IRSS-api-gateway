@@ -113,7 +113,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 Content-Type: application/json
 
 {
-  "ids": ["6"]
+  "ids": ["3"]
 }
 
 
@@ -125,4 +125,16 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 
 {
   "username": "以沫"
+}
+
+
+### add subscription
+POST http://127.0.0.1:11451/info/subscription/author/zhihu/subscribed
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "username": "以沫",
+  "id": "liaosunny123-60"
 }

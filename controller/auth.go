@@ -31,7 +31,6 @@ func Auth(c *gin.Context) {
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
-	log.Println("claims", claims)
 	if !ok || !token.Valid {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": "invalid token",
@@ -86,7 +85,9 @@ func Login(c *gin.Context) {
 		Token:      signedToken,
 		Id:         id,
 	})
-
+	go func() {
+		_ = SubscriptionTimer(id)
+	}()
 	return
 }
 
@@ -121,15 +122,14 @@ func Register(c *gin.Context) {
 		log.Println("[Register]fail to insert into database in register ", err)
 		return
 	}
-	_, err = pool.Exec("CREATE TABLE " + strconv.Itoa(int(id)) + "_article" + " (id bigint NOT NULL AUTO_INCREMENT,  content varchar(1000) NULL,  time varchar(255) NULL, media_type varchar(255) NULL,  topic varchar(255) NULL,  PRIMARY KEY (id));")
+	_, err = pool.Exec("CREATE TABLE " + strconv.Itoa(int(id)) + "_article" + " (id bigint NOT NULL AUTO_INCREMENT,  content varchar(1000) NULL,  time varchar(255) NULL, media_type varchar(255) NULL,  topic varchar(255) NULL,  PRIMARY KEY (id), checked int NULL, platform varchar(255) NULL);")
 	if err != nil {
 		log.Println("[Register]fail to create table in register ", err)
 		return
 	}
-	if err := SubscriptionTimer(id); err != nil {
-		log.Println("[Register]fail to create timer in register ", err)
-		return
-	}
+	go func() {
+		_ = SubscriptionTimer(id)
+	}()
 
 	c.JSON(200, models.RegisterResp{
 		StatusCode: 2,

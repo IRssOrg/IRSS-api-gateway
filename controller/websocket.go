@@ -77,9 +77,11 @@ func GetUserSubscription(id int64) (UserSubList, error) {
 		log.Println("[GetUserSubscription] query fail", err)
 		return subList, err
 	}
+	log.Println("zhihu:", string(zhihuByte))
 	err = json.Unmarshal(zhihuByte, &subList.Zhihu)
 	err = json.Unmarshal(wechatByte, &subList.Wechat)
 	err = json.Unmarshal(bilibiliByte, &subList.Bilibili)
+	log.Println("[GetUserSubscription] subList:", subList)
 	if err != nil {
 		log.Println("[GetUserSubscription] query fail", err)
 		return subList, err
