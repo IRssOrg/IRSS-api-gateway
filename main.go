@@ -24,6 +24,10 @@ func initRouter(r *gin.Engine) {
 	apiRouter.POST("/subscription/author/:platform/subscribed", controller.AddSubscription)
 	apiRouter.DELETE("/subscription/author/:platform/subscribed", controller.DeleteSubscription)
 
+	userRouter := r.Group("/user", controller.Auth)
+	userRouter.GET("/note", controller.GetNote)
+	userRouter.POST("/note", controller.SetNote)
+	userRouter.DELETE("/note", controller.DeleteNote)
 	r.GET("/account", controller.Auth, controller.GetAccount)
 	r.POST("/account", controller.Auth, controller.AddAccount)
 

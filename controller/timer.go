@@ -72,9 +72,9 @@ func SubscriptionTimer(id int64) error {
 		cronObj = cron.New()
 		Timers[id] = cronObj
 	}
-	if err := pushArticleNow(id); err != nil {
-		log.Println("[SubscriptionTimer] push article now fail", err)
-	}
+	//if err := pushArticleNow(id); err != nil {
+	//	log.Println("[SubscriptionTimer] push article now fail", err)
+	//}
 	_, err = cronObj.AddFunc(config.ArticleTime, func() {
 		timeRef, ok := LastUpdateTimeMap[id]
 		if !ok {
@@ -85,18 +85,15 @@ func SubscriptionTimer(id int64) error {
 			//timeRef.Wechat = 100000000
 			//timeRef.Bilibili = 10000000
 		}
-		log.Println(timeRef)
 		conn, ok := wsPool[int(id)]
-		log.Println(UserSubListMap[id])
 		var pushEvent []ArticleResp
 		for _, author := range UserSubListMap[id].Zhihu {
-			log.Println("[SubscriptionTimer] get zhihu author", author)
 			resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "zhihu")
 			if err != nil {
 				log.Println("[SubscriptionTimer] get zhihu author fail", err)
 				continue
 			}
-			log.Println(resp)
+			//log.Println(resp)
 			for _, v := range resp {
 				article, err := SearchPassage(strconv.Itoa(int(v.Id)), "zhihu")
 				if err != nil {
@@ -107,7 +104,6 @@ func SubscriptionTimer(id int64) error {
 				LastId, err := StoreArticle(id, article, ok)
 				article.Id = string(LastId)
 				pushEvent = append(pushEvent, article)
-
 			}
 		}
 		if ok {
@@ -122,7 +118,7 @@ func SubscriptionTimer(id int64) error {
 	})
 	cronObj.Start()
 	log.Println("[SubscriptionTimer] cron start")
-	time.Sleep(time.Hour * 72)
+	//time.Sleep(time.Hour * 72)
 	return nil
 }
 
@@ -169,14 +165,14 @@ func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error
 	case "wechat":
 		url = config.Spider.Wechat + "/api/passages/" + id + "/0"
 	}
-	log.Println(url)
+	//log.Println(url)
 	resp, err := http.Get(url)
 	var respList passageResp
 	if err != nil {
 		return respList.Ret, err
 	}
 	err = json.NewDecoder(resp.Body).Decode(&respList)
-	log.Println(respList.Ret)
+	//log.Println(respList.Ret)
 	defer resp.Body.Close()
 	if err != nil {
 		return respList.Ret, err

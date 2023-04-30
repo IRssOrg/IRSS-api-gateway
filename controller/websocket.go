@@ -44,6 +44,9 @@ func WsHandler(c *gin.Context) {
 	wsPool[id] = conn
 	mutex.Unlock()
 	c.Next()
+	if err := pushArticleNow(int64(id)); err != nil {
+		log.Println("[WsHandler] pushArticleNow fail", err)
+	}
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
