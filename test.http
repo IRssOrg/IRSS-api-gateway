@@ -138,3 +138,14 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
   "username": "以沫",
   "id": "liaosunny123-60"
 }
+
+
+### get answer
+POST http://127.0.0.1:11451/info/answer
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "question": "如何评价武汉大学"
+}

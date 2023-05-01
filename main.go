@@ -19,6 +19,7 @@ func initRouter(r *gin.Engine) {
 	apiRouter.GET("/:type/topics", controller.GetTopics)
 	apiRouter.POST("/config", controller.SetConfig)
 	apiRouter.GET("/ws", controller.WsHandler)
+	apiRouter.POST("answer", controller.GetAnswer)
 
 	apiRouter.POST("/subscription/author/:platform", controller.SearchAuthor)
 	apiRouter.POST("/subscription/author/:platform/subscribed", controller.AddSubscription)
@@ -28,6 +29,10 @@ func initRouter(r *gin.Engine) {
 	userRouter.GET("/note", controller.GetNote)
 	userRouter.POST("/note", controller.SetNote)
 	userRouter.DELETE("/note", controller.DeleteNote)
+	userRouter.GET("/favorite", controller.GetFavorite)
+	userRouter.POST("/favorite", controller.AddFavorite)
+	userRouter.DELETE("/favorite", controller.DeleteFavorite)
+
 	r.GET("/account", controller.Auth, controller.GetAccount)
 	r.POST("/account", controller.Auth, controller.AddAccount)
 

@@ -23,7 +23,7 @@
   },
   "processor": {
     "qq_summary": "",
-    "topic_processor": ""
+    "topic_processor": "http://127.0.0.1:8003"
   },
-  "gpt_token": ""
+  "gpt_token": "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"
 }
