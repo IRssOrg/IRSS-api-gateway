@@ -36,6 +36,7 @@ func initRouter(r *gin.Engine) {
 	r.GET("/account", controller.Auth, controller.GetAccount)
 	r.POST("/account", controller.Auth, controller.AddAccount)
 
+	r.POST("/summary/TopicListener", controller.TopicListener)
 }
 
 func main() {
@@ -44,7 +45,8 @@ func main() {
 		log.Fatal(err)
 	}
 	initRouter(r)
-	if err := r.Run("0.0.0.0:11451"); err != nil {
+
+	if err := r.Run("0.0.0.0:8080"); err != nil {
 		log.Fatal(err)
 	}
 }

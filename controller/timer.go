@@ -76,52 +76,12 @@ func SubscriptionTimer(id int64) error {
 		cronObj = cron.New()
 		Timers[id] = cronObj
 	}
-	//if err := pushArticleNow(id); err != nil {
-	//	log.Println("[SubscriptionTimer] push article now fail", err)
-	//}
 	_, err = cronObj.AddFunc(config.ArticleTime, func() {
-		timeRef, ok := LastUpdateTimeMap[id]
-		if !ok {
-			timeRef.Zhihu = time.Now().Unix()
-			timeRef.Wechat = time.Now().Unix()
-			timeRef.Bilibili = time.Now().Unix()
-			//timeRef.Zhihu = 100000000
-			//timeRef.Wechat = 100000000
-			//timeRef.Bilibili = 10000000
-		}
 		conn, ok := wsPool[int(id)]
-		var pushEvent []ArticleResp
-		for _, author := range UserSubListMap[id].Zhihu {
-			resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "zhihu")
-			if err != nil {
-				log.Println("[SubscriptionTimer] get zhihu author fail", err)
-				continue
-			}
-			for _, v := range resp {
-				article, err := SearchPassage(strconv.Itoa(int(v.Id)), "zhihu")
-				if err != nil {
-					log.Println("[SubscriptionTimer] get zhihu article fail", err)
-					continue
-				}
-				article.Time = v.Time
-				hash, err := dispatcher.UploadPassage(article.Content)
-				topicString, err := GetTopicString(id)
-				relatives, err := dispatcher.ConfirmTopicWithRelative(hash, topicString)
-				for _, v := range relatives {
-					rel, err := strconv.ParseFloat(v.Relative, 64)
-					if err != nil {
-						log.Println("[SubscriptionTimer] parse relative fail", err)
-						continue
-					}
-					if rel > 0.5 {
-						LastId, _ := StoreArticle(id, article, ok)
-						article.Id = string(LastId)
-						article.Topic = v.Topic
-						pushEvent = append(pushEvent, article)
-					}
-				}
-
-			}
+		pushEvent, err := GetWhat2Push(id, ok)
+		if err != nil {
+			log.Println("[SubscriptionTimer] get what to push fail", err)
+			return
 		}
 		if ok {
 			if err := conn.WriteJSON(gin.H{
@@ -137,6 +97,76 @@ func SubscriptionTimer(id int64) error {
 	log.Println("[SubscriptionTimer] cron start")
 	//time.Sleep(time.Hour * 72)
 	return nil
+}
+
+func GetWhat2Push(id int64, isOnline bool) ([]ArticleResp, error) {
+	var pushEvent []ArticleResp
+	timeRef, ok := LastUpdateTimeMap[id]
+	if !ok {
+		timeRef.Zhihu = time.Now().Unix()
+		timeRef.Wechat = time.Now().Unix()
+		timeRef.Bilibili = time.Now().Unix()
+	}
+	for _, author := range UserSubListMap[id].Zhihu {
+		resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "zhihu")
+		if err != nil {
+			log.Println("[SubscriptionTimer] get zhihu author fail", err)
+			continue
+		}
+		articleList, err := SelectRelativePassages(resp, "zhihu", id, isOnline)
+		pushEvent = append(pushEvent, articleList...)
+	}
+	for _, author := range UserSubListMap[id].Wechat {
+		resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "wechat")
+		if err != nil {
+			log.Println("[SubscriptionTimer] get zhihu author fail", err)
+			continue
+		}
+		articleList, err := SelectRelativePassages(resp, "wechat", id, isOnline)
+		pushEvent = append(pushEvent, articleList...)
+	}
+	return pushEvent, nil
+}
+
+func SelectRelativePassages(resp []passages, platform string, id int64, isOnline bool) ([]ArticleResp, error) {
+	var articleList []ArticleResp
+	for _, v := range resp {
+		article, err := SearchPassage(strconv.Itoa(int(v.Id)), platform)
+		if err != nil {
+			log.Println("[SubscriptionTimer] get zhihu article fail", err)
+			continue
+		}
+		article.Time = v.Time
+		article, ok, err := IfRelative(article, id, isOnline)
+		if err != nil || !ok {
+			continue
+		}
+		articleList = append(articleList, article)
+	}
+	return articleList, nil
+}
+
+func IfRelative(article ArticleResp, id int64, isOnline bool) (ArticleResp, bool, error) {
+	hash, err := dispatcher.UploadPassage(article.Content)
+	if err != nil {
+		return article, false, err
+	}
+	topicString, err := GetTopicString(id)
+	relatives, err := dispatcher.ConfirmTopicWithRelative(hash, topicString)
+	for _, v := range relatives {
+		rel, err := strconv.ParseFloat(v.Relative, 64)
+		if err != nil {
+			log.Println("[SubscriptionTimer] parse relative fail", err)
+			continue
+		}
+		if rel > 0.5 {
+			LastId, _ := StoreArticle(id, article, isOnline)
+			article.Id = string(LastId)
+			article.Topic = v.Topic
+			return article, true, nil
+		}
+	}
+	return article, false, nil
 }
 
 func pushArticleNow(id int64) error {

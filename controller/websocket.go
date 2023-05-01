@@ -47,6 +47,9 @@ func WsHandler(c *gin.Context) {
 	if err := pushArticleNow(int64(id)); err != nil {
 		log.Println("[WsHandler] pushArticleNow fail", err)
 	}
+	if err := pushMessageNow(int64(id)); err != nil {
+		log.Println("[WsHandler] pushMessageNow fail", err)
+	}
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
