@@ -1,5 +1,5 @@
 ### 注册
-POST http://127.0.0.1:11451/auth/register
+POST http://127.0.0.1:8080/auth/register
 Accept: application/json
 Content-Type: application/json
 
@@ -9,7 +9,7 @@ Content-Type: application/json
 }
 
 ### 登录
-POST http://127.0.0.1:11451/auth/login
+POST http://127.0.0.1:8080/auth/login
 Accept: application/json
 Content-Type: application/json
 
@@ -19,7 +19,7 @@ Content-Type: application/json
 }
 
 ### set topics article
-POST http://127.0.0.1:11451/subscription/article/topics
+POST http://127.0.0.1:8080/subscription/article/topics
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIxNjc4NDAsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.xccR1Zxq5apFjUyc0I41FV_E8p0kitMFySwV0x0lQ5w
@@ -29,7 +29,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIxNjc4NDAsInVz
 }
 
 ### set topics qq
-POST http://127.0.0.1:11451/subscription/qq/topics
+POST http://127.0.0.1:8080/subscription/qq/topics
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
@@ -40,7 +40,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVz
 
 
 ### get topics
-GET http://127.0.0.1:11451/subscription/article/topics
+GET http://127.0.0.1:8080/subscription/article/topics
 Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
 
@@ -48,7 +48,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVz
 
 
 ### set user config
-POST http://127.0.0.1:11451/subscription/config
+POST http://127.0.0.1:8080/subscription/config
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
@@ -60,21 +60,21 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVz
 }
 
 ### upgrade to ws
-GET http://127.0.0.1:11451/subscription/ws
+GET http://127.0.0.1:8080/subscription/ws
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
 
 
 ### get accounts
-GET http://127.0.0.1:11451/account
+GET http://127.0.0.1:8080/account
 Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 
 
 ### add accounts
-POST http://127.0.0.1:11451/account
+POST http://127.0.0.1:8080/account
 Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 Content-Type: application/json
@@ -85,13 +85,13 @@ Content-Type: application/json
 }
 
 ### get topics
-GET http://127.0.0.1:11451/info/article/topics
+GET http://127.0.0.1:8080/info/article/topics
 Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 
 ### add topics
-PATCH http://127.0.0.1:11451/info/article/topics/selected
+PATCH http://127.0.0.1:8080/info/article/topics/selected
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
@@ -101,13 +101,13 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 }
 
 ### get selected topics
-GET http://127.0.0.1:11451/info/article/topics/selected
+GET http://127.0.0.1:8080/info/article/topics/selected
 Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 
 ### set selected topics
-POST http://127.0.0.1:11451/info/article/topics/selected
+POST http://127.0.0.1:8080/info/article/topics/selected
 Accept: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 Content-Type: application/json
@@ -118,7 +118,7 @@ Content-Type: application/json
 
 
 ### search author
-POST http://127.0.0.1:11451/info/subscription/author/zhihu
+POST http://127.0.0.1:8080/info/subscription/author/zhihu
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
@@ -129,7 +129,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 
 
 ### add subscription
-POST http://127.0.0.1:11451/info/subscription/author/zhihu/subscribed
+POST http://127.0.0.1:8080/info/subscription/author/zhihu/subscribed
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
@@ -141,7 +141,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 
 
 ### get answer
-POST http://127.0.0.1:11451/info/answer
+POST http://127.0.0.1:8080/info/answer
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
