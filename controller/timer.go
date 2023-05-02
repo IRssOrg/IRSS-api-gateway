@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 import "github.com/robfig/cron/v3"
 
@@ -117,16 +118,16 @@ func GetWhat2Push(id int64, isOnline bool) ([]ArticleResp, error) {
 	log.Println("[SubscriptionTimer] get what to push running, id:", id, "isOnline:", isOnline)
 	timeRef, ok := LastUpdateTimeMap[id]
 	if !ok {
-		//timeRef.Zhihu = time.Now().Unix() - 100000
-		//timeRef.Wechat = time.Now().Unix() - 100000
-		//timeRef.Bilibili = time.Now().Unix() - 100000
-		timeRef.Zhihu = 100000
-		timeRef.Wechat = 100000
-		timeRef.Bilibili = 100000
+		timeRef.Zhihu = time.Now().Unix() - 1000000
+		timeRef.Wechat = time.Now().Unix() - 1000000
+		timeRef.Bilibili = time.Now().Unix() - 1000000
+		//timeRef.Zhihu = 100000
+		//timeRef.Wechat = 100000
+		//timeRef.Bilibili = 100000
 	}
 	log.Println("[SubscriptionTimer] sublist", UserSubListMap[id].Zhihu)
 	for _, author := range UserSubListMap[id].Zhihu {
-		resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "zhihu")
+		resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "zhihu", id)
 		if err != nil {
 			log.Println("[SubscriptionTimer] get zhihu author fail", err)
 			continue
@@ -135,7 +136,7 @@ func GetWhat2Push(id int64, isOnline bool) ([]ArticleResp, error) {
 		pushEvent = append(pushEvent, articleList...)
 	}
 	for _, author := range UserSubListMap[id].Wechat {
-		resp, err := GetFromAuthor(author.Id, timeRef.Wechat, "wechat")
+		resp, err := GetFromAuthor(author.Id, timeRef.Wechat, "wechat", id)
 		if err != nil {
 			log.Println("[SubscriptionTimer] get wechat author fail", err)
 			continue
@@ -144,7 +145,7 @@ func GetWhat2Push(id int64, isOnline bool) ([]ArticleResp, error) {
 		pushEvent = append(pushEvent, articleList...)
 	}
 	for _, author := range UserSubListMap[id].Bilibili {
-		resp, err := GetVideos(author.Id, timeRef.Bilibili)
+		resp, err := GetVideos(author.Id, timeRef.Bilibili, id)
 		if err != nil {
 			log.Println("[SubscriptionTimer] get bilibili author fail", err)
 			continue
@@ -281,7 +282,7 @@ func pushArticleNow(id int64) error {
 	return nil
 }
 
-func GetVideos(id string, timeRef int64) ([]Videos, error) {
+func GetVideos(id string, timeRef int64, userId int64) ([]Videos, error) {
 	url := config.Spider.Bilibili + "/api/passages/" + id + "/0"
 	resp, err := http.Get(url)
 	var respList videoResp
@@ -295,15 +296,25 @@ func GetVideos(id string, timeRef int64) ([]Videos, error) {
 		return respList.Ret, err
 	}
 	var ret []Videos
+	var maxTime int64
 	for _, v := range respList.Ret {
 		if v.TimeStamp > timeRef {
 			ret = append(ret, v)
 		}
+		if v.TimeStamp > maxTime {
+			maxTime = v.TimeStamp
+		}
 	}
+	timeMap, ok := LastUpdateTimeMap[userId]
+	if !ok {
+		return ret, nil
+	}
+	timeMap.Bilibili = maxTime
+	LastUpdateTimeMap[userId] = timeMap
 	return ret, nil
 }
 
-func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error) {
+func GetFromAuthor(id string, timeRef int64, platform string, userId int64) ([]passages, error) {
 	url := config.Spider.Zhihu + "/api/passages/" + id + "/0"
 	switch platform {
 	case "bilibili":
@@ -327,11 +338,28 @@ func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error
 		return respList.Ret, err
 	}
 	var ret []passages
+	var maxTimeStamp int64 = 0
 	for _, v := range respList.Ret {
 		if v.TimeStamp > timeRef {
 			ret = append(ret, v)
+			if v.TimeStamp > maxTimeStamp {
+				maxTimeStamp = v.TimeStamp
+			}
 		}
 	}
+	timeMap, ok := LastUpdateTimeMap[userId]
+	if !ok {
+		return ret, nil
+	}
+	switch platform {
+	case "zhihu":
+		timeMap.Zhihu = maxTimeStamp
+	case "bilibili":
+		timeMap.Bilibili = maxTimeStamp
+	case "wechat":
+		timeMap.Wechat = maxTimeStamp
+	}
+	LastUpdateTimeMap[userId] = timeMap
 	return ret, nil
 }
 
