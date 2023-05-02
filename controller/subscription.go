@@ -74,7 +74,7 @@ func GetSubscription(c *gin.Context) {
 		log.Println("[GetSubscription] get userId fail")
 		return
 	}
-	id := idCode.(int64)
+	id := idCode.(int)
 	platform := c.Param("platform")
 	col := "zhihu_sub"
 	switch platform {

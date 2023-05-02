@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 import "github.com/robfig/cron/v3"
 
@@ -88,7 +87,9 @@ func SubscriptionTimer(id int64) error {
 		cronObj = cron.New()
 		Timers[id] = cronObj
 	}
+	log.Println("[SubscriptionTimer] cron starting")
 	_, err = cronObj.AddFunc(config.ArticleTime, func() {
+		log.Println("[SubscriptionTimer] cron running")
 		conn, ok := wsPool[int(id)]
 		pushEvent, err := GetWhat2Push(id, ok)
 		if err != nil {
@@ -113,12 +114,17 @@ func SubscriptionTimer(id int64) error {
 
 func GetWhat2Push(id int64, isOnline bool) ([]ArticleResp, error) {
 	var pushEvent []ArticleResp
+	log.Println("[SubscriptionTimer] get what to push running, id:", id, "isOnline:", isOnline)
 	timeRef, ok := LastUpdateTimeMap[id]
 	if !ok {
-		timeRef.Zhihu = time.Now().Unix() - 100000
-		timeRef.Wechat = time.Now().Unix() - 100000
-		timeRef.Bilibili = time.Now().Unix() - 100000
+		//timeRef.Zhihu = time.Now().Unix() - 100000
+		//timeRef.Wechat = time.Now().Unix() - 100000
+		//timeRef.Bilibili = time.Now().Unix() - 100000
+		timeRef.Zhihu = 100000
+		timeRef.Wechat = 100000
+		timeRef.Bilibili = 100000
 	}
+	log.Println("[SubscriptionTimer] sublist", UserSubListMap[id].Zhihu)
 	for _, author := range UserSubListMap[id].Zhihu {
 		resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "zhihu")
 		if err != nil {
@@ -307,7 +313,7 @@ func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error
 	case "wechat":
 		url = config.Spider.Wechat + "/api/passages/" + id + "/0"
 	}
-	//log.Println(url)
+	log.Println(url)
 	resp, err := http.Get(url)
 	var respList passageResp
 	if err != nil {
@@ -315,7 +321,7 @@ func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&respList)
-	//log.Println(respList.Ret)
+	log.Println(respList.Ret)
 	defer resp.Body.Close()
 	if err != nil {
 		return respList.Ret, err

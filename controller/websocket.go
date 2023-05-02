@@ -6,6 +6,7 @@ import (
 	"irss-gateway/models"
 	"log"
 	"sync"
+	"time"
 )
 import "github.com/gorilla/websocket"
 
@@ -24,15 +25,13 @@ type UserSubList struct {
 	Bilibili []Author `json:"bilibili"`
 }
 
-type LastUpdateTime struct {
-}
-
 func WsHandler(c *gin.Context) {
-	idCode, ok := c.Get("id")
+	idCode, ok := c.Get("userId")
 	if !ok {
+		log.Println("[WsHandler] get userId fail")
 		return
 	}
-	id := int(idCode.(float64))
+	id := idCode.(int)
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -40,10 +39,8 @@ func WsHandler(c *gin.Context) {
 		})
 		return
 	}
-	mutex.Lock()
 	wsPool[id] = conn
-	mutex.Unlock()
-	c.Next()
+
 	if err := pushArticleNow(int64(id)); err != nil {
 		log.Println("[WsHandler] pushArticleNow fail", err)
 	}
@@ -53,6 +50,9 @@ func WsHandler(c *gin.Context) {
 	if err := pushMessageNow(int64(id), 2); err != nil {
 		log.Println("[WsHandler] pushMessageNow fail", err)
 	}
+	go func() {
+		_ = SubscriptionTimer(int64(id))
+	}()
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
@@ -63,7 +63,7 @@ func WsHandler(c *gin.Context) {
 	mutex.Lock()
 	delete(wsPool, id)
 	mutex.Unlock()
-	c.Next()
+	time.Sleep(120 * time.Second)
 }
 
 func GetUserConfig(id int64) (models.UserConfig, error) {

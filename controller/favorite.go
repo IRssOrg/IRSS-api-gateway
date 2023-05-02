@@ -27,7 +27,7 @@ func AddFavorite(c *gin.Context) {
 		log.Println("[AddFavorite] get userId fail")
 		return
 	}
-	id := idCode.(int64)
+	id := idCode.(int)
 	var req FavoriteList
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("[AddFavorite] read json fail", err)
@@ -37,7 +37,7 @@ func AddFavorite(c *gin.Context) {
 		})
 		return
 	}
-	favoriteList, err := GetFavoriteList(id)
+	favoriteList, err := GetFavoriteList(int64(id))
 	favoriteList = append(favoriteList, req.Favorites...)
 	favoriteByte, err := json.Marshal(favoriteList)
 	if err != nil {
@@ -72,8 +72,8 @@ func GetFavorite(c *gin.Context) {
 		log.Println("[GetFavorite] get userId fail")
 		return
 	}
-	id := idCode.(int64)
-	favoriteList, err := GetFavoriteList(id)
+	id := idCode.(int)
+	favoriteList, err := GetFavoriteList(int64(id))
 	if err != nil {
 		log.Println("[GetFavorite] get favorite list fail", err)
 		return
@@ -89,7 +89,7 @@ func DeleteFavorite(c *gin.Context) {
 		log.Println("[DeleteFavorite] get userId fail")
 		return
 	}
-	id := idCode.(int64)
+	id := idCode.(int)
 	var req DeleteFavoriteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Println("[DeleteFavorite] read json fail", err)
@@ -99,7 +99,7 @@ func DeleteFavorite(c *gin.Context) {
 		})
 		return
 	}
-	favoriteList, err := GetFavoriteList(id)
+	favoriteList, err := GetFavoriteList(int64(id))
 	if err != nil {
 		log.Println("[DeleteFavorite] get favorite list fail", err)
 		return

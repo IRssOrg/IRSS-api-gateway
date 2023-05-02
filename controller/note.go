@@ -20,12 +20,12 @@ type DeleteNoteReq struct {
 }
 
 func GetNote(c *gin.Context) {
-	idCode, ok := c.Get("id")
+	idCode, ok := c.Get("userId")
 	if !ok {
 		return
 	}
-	id := idCode.(int64)
-	noteList, err := GetNoteList(id)
+	id := idCode.(int)
+	noteList, err := GetNoteList(int64(id))
 	if err != nil {
 		log.Println("[GetNote] get note list fail", err)
 		c.JSON(500, gin.H{
@@ -63,11 +63,11 @@ func GetNoteList(id int64) ([]NoteResp, error) {
 }
 
 func SetNote(c *gin.Context) {
-	idCode, ok := c.Get("id")
+	idCode, ok := c.Get("userId")
 	if !ok {
 		return
 	}
-	id := idCode.(int64)
+	id := idCode.(int)
 	var req NoteResp
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
@@ -81,7 +81,7 @@ func SetNote(c *gin.Context) {
 		log.Println("[SetNote] insert note fail", err)
 		return
 	}
-	noteList, err := GetNoteList(id)
+	noteList, err := GetNoteList(int64(id))
 	if err != nil {
 		log.Println("[SetNote] get note list fail", err)
 		return
@@ -93,11 +93,11 @@ func SetNote(c *gin.Context) {
 }
 
 func DeleteNote(c *gin.Context) {
-	idCode, ok := c.Get("id")
+	idCode, ok := c.Get("userId")
 	if !ok {
 		return
 	}
-	id := idCode.(int64)
+	id := idCode.(int)
 	var req DeleteNoteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{
@@ -113,7 +113,7 @@ func DeleteNote(c *gin.Context) {
 			continue
 		}
 	}
-	noteList, err := GetNoteList(id)
+	noteList, err := GetNoteList(int64(id))
 	if err != nil {
 		log.Println("[DeleteNote] get note list fail", err)
 		return

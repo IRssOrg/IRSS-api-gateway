@@ -38,6 +38,8 @@ func UploadPassage(content string) (string, error) {
 	} else {
 		return res.Hash, nil
 	}
+
+	//return "hash", nil
 }
 
 func AskQuestion(hash string, question string) (string, error) {
@@ -83,6 +85,8 @@ func Summary(hash string) (string, error) {
 	} else {
 		return res.Content, nil
 	}
+
+	//return "summary", nil
 }
 
 func GetPassageTopics(hash string) ([]models.TopicWithRelative, error) {
@@ -105,6 +109,13 @@ func GetPassageTopics(hash string) ([]models.TopicWithRelative, error) {
 	} else {
 		return res.Topics, nil
 	}
+	//var list []models.TopicWithRelative
+	//topic := models.TopicWithRelative{
+	//	Topic:    "miku",
+	//	Relative: "0.6",
+	//}
+	//list = append(list, topic)
+	//return list, nil
 }
 
 func ConfirmTopicWithRelative(hash string, topic string) ([]models.TopicWithRelative, error) {
@@ -128,4 +139,11 @@ func ConfirmTopicWithRelative(hash string, topic string) ([]models.TopicWithRela
 	} else {
 		return res.Topics, nil
 	}
+	//var list []models.TopicWithRelative
+	//topicRef := models.TopicWithRelative{
+	//	Topic:    "miku",
+	//	Relative: "0.6",
+	//}
+	//list = append(list, topicRef)
+	//return list, nil
 }

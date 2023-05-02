@@ -111,8 +111,8 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	stmt, err := pool.Prepare("insert into public.users(username, password, article_topic, qq_topic, qq, selected_topic, wechat_sub, zhihu_sub, bilibili_sub) values (?, ?, ?, ?, ?, ?)")
-	result, err := stmt.Exec(req.Username, req.Password, "[]", "[]", "{\"accounts\":[]}", "[]", "[]", "[]", "[]")
+	stmt, err := pool.Prepare("insert into public.users(username, password, article_topic, qq_topic, qq, selected_topic, wechat_sub, zhihu_sub, bilibili_sub, favorite_article) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	result, err := stmt.Exec(req.Username, req.Password, "[]", "[]", "{\"accounts\":[]}", "[]", "[]", "[]", "[]", "[]")
 	id, err = result.LastInsertId()
 	if err != nil {
 		c.JSON(200, models.RegisterResp{

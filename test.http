@@ -4,7 +4,7 @@ Accept: application/json
 Content-Type: application/json
 
 {
-  "username": "lafa123456",
+  "username": "lingzhiii",
   "password": "123456"
 }
 
@@ -19,51 +19,35 @@ Content-Type: application/json
 }
 
 ### set topics article
-POST http://127.0.0.1:8080/subscription/article/topics
+POST http://127.0.0.1:8080/info/article/topics/selected
 Accept: application/json
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIxNjc4NDAsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.xccR1Zxq5apFjUyc0I41FV_E8p0kitMFySwV0x0lQ5w
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 {
   "topics": ["进击的巨人", "miku", "张可为", "xiaotong"]
 }
 
-### set topics qq
-POST http://127.0.0.1:8080/subscription/qq/topics
+
+
+### get topics article
+GET http://127.0.0.1:8080/info/article/topics/selected
 Accept: application/json
 Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
-
-{
-  "topics": ["进击的巨人", "miku", "张可为"]
-}
-
-
-### get topics
-GET http://127.0.0.1:8080/subscription/article/topics
-Accept: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODIwMzk5MjgsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.J3gLuMh_tCyUzlgDN8_5fKuN7QVLgpPxcLKPFAGpL5A
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 
 
-
-### set user config
-POST http://127.0.0.1:8080/subscription/config
-Accept: application/json
-Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
-
-{
-  "articleTime": 600,
-  "messageTime": 600,
-  "videoTime": 600
-}
-
-### upgrade to ws
-GET http://127.0.0.1:8080/subscription/ws
-Accept: application/json
-Content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
+#POST http://127.0.0.1:8080/subscription/config
+#Accept: application/json
+#Content-Type: application/json
+#Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
+#
+#{
+#  "articleTime": 600,
+#  "messageTime": 600,
+#  "videoTime": 600
+#}
 
 
 ### get accounts
@@ -80,8 +64,8 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 Content-Type: application/json
 
 {
-  "username": "lingzdhi",
-  "secret": "lingzhi"
+  "username": "1597083201",
+  "secret": "zkw030813"
 }
 
 ### get topics
@@ -97,7 +81,7 @@ Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 {
-  "topic": "good"
+  "topic": "lalla"
 }
 
 ### get selected topics
@@ -113,7 +97,7 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 Content-Type: application/json
 
 {
-  "ids": ["6"]
+  "topics": ["nihao", "hello", "miku"]
 }
 
 
@@ -124,7 +108,7 @@ Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 {
-  "username": "以沫"
+  "question": "xiwen"
 }
 
 
@@ -135,10 +119,19 @@ Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 {
-  "username": "以沫",
-  "id": "liaosunny123-60"
+  "username": "xiwen",
+  "id": "xiwen-96-2"
 }
 
+### delete subscription
+DELETE http://127.0.0.1:8080/info/subscription/author/zhihu/subscribed
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "id": "xiwen-96-2"
+}
 
 ### get answer
 POST http://127.0.0.1:8080/info/answer
@@ -147,5 +140,58 @@ Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
 
 {
-  "question": "如何评价武汉大学"
+  "question": "如何评价华中科技大学大学"
+}
+
+### get note
+GET http://127.0.0.1:8080/user/note
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+### set note
+POST http://127.0.0.1:8080/user/note
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "article_id": "3",
+  "note": {
+    "content": ".asdf...",
+    "time": "..."
+  }
+}
+
+### delete notes
+DELETE http://127.0.0.1:8080/user/note
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "article_ids": ["2"]
+}
+
+
+### get favorite
+GET http://127.0.0.1:8080/user/favorite
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+
+### add favorite
+POST http://127.0.0.1:8080/user/favorite
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "favorites": [
+    {
+      "type": "article",
+      "id": "3"
+    }
+  ]
 }

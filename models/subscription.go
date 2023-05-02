@@ -10,7 +10,7 @@ type Topic struct {
 }
 
 type SelectedTopics struct {
-	Topics []string `json:"ids"`
+	Topics []string `json:"topics"`
 }
 
 type SearchAuthor struct {
