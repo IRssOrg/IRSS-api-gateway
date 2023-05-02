@@ -68,6 +68,34 @@ func SearchAuthor(c *gin.Context) {
 	return
 }
 
+func GetSubscription(c *gin.Context) {
+	idCode, ok := c.Get("userId")
+	if !ok {
+		log.Println("[GetSubscription] get userId fail")
+		return
+	}
+	id := idCode.(int64)
+	platform := c.Param("platform")
+	col := "zhihu_sub"
+	switch platform {
+	case "bilibili":
+		col = "bilibili_sub"
+	case "zhihu":
+		col = "zhihu_sub"
+	case "wechat":
+		col = "wechat_sub"
+	}
+	var subList []byte
+	err := pool.QueryRow("select "+col+" from public.users where id=?", id).Scan(&subList)
+	if err != nil {
+		log.Println("[GetSubscription] query fail", err)
+		return
+	}
+	c.JSON(200, gin.H{
+		"authors": string(subList),
+	})
+}
+
 func AddSubscription(c *gin.Context) {
 	idCode, ok := c.Get("userId")
 	if !ok {

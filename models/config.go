@@ -29,5 +29,6 @@ type Config struct {
 		TopicProcessor string `json:"topic_processor"`
 	} `json:"processor"`
 
-	Token string `json:"gpt_token"`
+	Token   string `json:"gpt_token"`
+	VIPUser int    `json:"vip_user"`
 }

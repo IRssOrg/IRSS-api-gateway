@@ -36,7 +36,7 @@ func AddTopics(c *gin.Context) {
 		return
 	}
 	var topics []string
-	var topicIds []int
+	var topicIds []string
 	err = json.Unmarshal(topicbyte, &topics)
 	err = json.Unmarshal(topicIdByte, &topicIds)
 	if err != nil {
@@ -44,9 +44,7 @@ func AddTopics(c *gin.Context) {
 		return
 	}
 	topics = append(topics, topic)
-	topicId := len(topics)
-	log.Println("topicId:", topicId)
-	topicIds = append(topicIds, topicId)
+	topicIds = append(topicIds, topic)
 	jsonArray, err := json.Marshal(topics)
 	jsonArrayId, err := json.Marshal(topicIds)
 	if err != nil {
@@ -70,6 +68,33 @@ func AddTopics(c *gin.Context) {
 	resp.StatusCode = 0
 	c.JSON(200, resp)
 	return
+}
+
+func AddTopicList(topicsRef []string, id int64) error {
+	var topicByte []byte
+	var topics []string
+	err := pool.QueryRow("select article_topic from public.users where id=?", id).Scan(&topicByte)
+	if err != nil {
+		log.Println("[setArticleTopics] query fail", err)
+		return err
+	}
+	err = json.Unmarshal(topicByte, &topics)
+	if err != nil {
+		log.Println("[setArticleTopics] unmarshal fail", err)
+		return err
+	}
+	topics = append(topics, topicsRef...)
+	jsonArray, err := json.Marshal(topics)
+	if err != nil {
+		log.Println("[setArticleTopic] json marshal fail", err)
+		return err
+	}
+	_, err = pool.Exec("update public.users set article_topic=? where id=?", string(jsonArray), id)
+	if err != nil {
+		log.Println("[setArticleTopic] exec stmt fail", err)
+		return err
+	}
+	return nil
 }
 
 func GetTopics(c *gin.Context) {
@@ -142,24 +167,20 @@ func GetSelectedTopics(c *gin.Context) {
 		return
 	}
 	id := idCode.(int)
-	var topicIdByte []byte
-	err := pool.QueryRow("select selected_topic from public.users where id=?", id).Scan(&topicIdByte)
+	var topicByte []byte
+	err := pool.QueryRow("select selected_topic from public.users where id=?", id).Scan(&topicByte)
 	if err != nil {
 		log.Println("[GetTopics] query fail", err)
 		return
 	}
-	var topicIds []int
-	err = json.Unmarshal(topicIdByte, &topicIds)
+	var topics []string
+	err = json.Unmarshal(topicByte, &topics)
 	if err != nil {
 		log.Println("[GetTopics] unmarshal fail", err)
 		return
 	}
-	var IdString []string
-	for _, v := range topicIds {
-		IdString = append(IdString, strconv.Itoa(v))
-	}
 	c.JSON(200, models.SelectedTopics{
-		Ids: IdString,
+		Topics: topics,
 	})
 }
 
@@ -179,12 +200,8 @@ func SetTopics(c *gin.Context) {
 		})
 		return
 	}
-	var topicInts []int
-	for _, v := range req.Ids {
-		topicId, _ := strconv.Atoi(v)
-		topicInts = append(topicInts, topicId)
-	}
-	topicIds, err := json.Marshal(topicInts)
+
+	topicIds, err := json.Marshal(req.Topics)
 	if err != nil {
 		log.Println("[setArticleTopics] marshal fail", err)
 		return

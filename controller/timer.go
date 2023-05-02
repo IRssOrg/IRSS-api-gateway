@@ -138,9 +138,16 @@ func SelectRelativePassages(resp []passages, platform string, id int64, isOnline
 		}
 		article.Time = v.Time
 		article, ok, err := IfRelative(article, id, isOnline)
+		topicWithRel, err := dispatcher.GetPassageTopics(article.Content)
+
 		if err != nil || !ok {
 			continue
 		}
+		var topics []string
+		for _, v := range topicWithRel {
+			topics = append(topics, v.Topic)
+		}
+		err = AddTopicList(topics, id)
 		articleList = append(articleList, article)
 	}
 	return articleList, nil

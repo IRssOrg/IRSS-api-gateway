@@ -8,11 +8,11 @@ import (
 )
 
 type TopicGet struct {
-	Topic   string `json:"topic"`
-	Group   string `json:"group"`
-	User    string `json:"user"`
-	RawText string `json:"raw_text"`
-	Summary string `json:"summary"`
+	Topic   string `json:"Topic"`
+	Group   string `json:"Group"`
+	User    string `json:"User"`
+	RawText string `json:"RawText"`
+	Summary string `json:"Summary"`
 }
 
 type Message struct {
@@ -21,6 +21,12 @@ type Message struct {
 	Topic           string `json:"topic"`
 	OriginalContent string `json:"original_content"`
 	Id              string `json:"id"`
+}
+
+type Summary struct {
+	Group   string `json:"Group"`
+	RawText string `json:"RawText"`
+	Summary string `json:"Summary"`
 }
 
 func TopicListener(c *gin.Context) {
@@ -47,14 +53,14 @@ func TopicListener(c *gin.Context) {
 	isChecked := 1
 	if !ok {
 		isChecked = 0
-		_, err := StoreMessage(id, original, isChecked)
+		_, err := StoreMessage(id, original, isChecked, 1)
 		if err != nil {
 			log.Println("[TopicListener] store message fail", err)
 			return
 		}
 		return
 	}
-	lastId, err := StoreMessage(id, original, isChecked)
+	lastId, err := StoreMessage(id, original, isChecked, 1)
 	original.Id = string(lastId)
 	var list []Message
 	list = append(list, original)
@@ -65,12 +71,12 @@ func TopicListener(c *gin.Context) {
 	err = conn.WriteJSON(msg)
 }
 
-func StoreMessage(id int64, msg Message, checked int) (int64, error) {
+func StoreMessage(id int64, msg any, checked int, typeCode int) (int64, error) {
 	msgJson, err := json.Marshal(msg)
 	if err != nil {
 		return -1, err
 	}
-	result, err := pool.Exec("insert into message (user_id, message, is_checked) values (?, ?, ?)", id, string(msgJson), checked)
+	result, err := pool.Exec("insert into message (user_id, message, is_checked, type) values (?, ?, ?. ?)", id, string(msgJson), checked, typeCode)
 	if err != nil {
 		return -1, err
 	}
@@ -81,43 +87,97 @@ func StoreMessage(id int64, msg Message, checked int) (int64, error) {
 	return lastId, nil
 }
 
-func pushMessageNow(id int64) error {
-	rows, err := pool.Query("select message from message where user_id=? and is_checked=0", id)
+func pushMessageNow(id int64, typeCode int) error {
+	rows, err := pool.Query("select message from message where user_id=? and is_checked=0 and type=1", id)
+	if typeCode == 2 {
+		rows, err = pool.Query("select message from message where user_id=? and is_checked=0 and type=2", id)
+	}
 	if err != nil {
 		log.Println("[pushMessageNow] query fail", err)
 		return err
 	}
 	var list []Message
+	var sumList []Summary
 	for rows.Next() {
 		var msg Message
+		var sum Summary
 		var msgJson string
 		err := rows.Scan(&msgJson)
 		if err != nil {
 			log.Println("[pushMessageNow] scan fail", err)
 			return err
 		}
-		err = json.Unmarshal([]byte(msgJson), &msg)
+		if typeCode == 1 {
+			err = json.Unmarshal([]byte(msgJson), &msg)
+			if err != nil {
+				log.Println("[pushMessageNow] unmarshal fail", err)
+				return err
+			}
+			list = append(list, msg)
+			continue
+		}
+		err = json.Unmarshal([]byte(msgJson), &sum)
 		if err != nil {
 			log.Println("[pushMessageNow] unmarshal fail", err)
 			return err
 		}
-		list = append(list, msg)
+		sumList = append(sumList, sum)
+
 	}
 	conn, ok := wsPool[int(id)]
 	if !ok {
 		return nil
 	}
-	_, err = pool.Exec("update message set is_checked=1 where user_id=? and is_checked=0", id)
+	_, err = pool.Exec("update message set is_checked=1 where user_id=? and is_checked=0 and type=1", id)
+	if typeCode == 2 {
+		_, err = pool.Exec("update message set is_checked=1 where user_id=? and is_checked=0 and type=2", id)
+	}
 	if err != nil {
 		log.Println("[pushMessageNow] update fail", err)
 		return err
 	}
+	if typeCode == 1 {
+		if err := conn.WriteJSON(gin.H{
+			"event":    "message notification",
+			"messages": list,
+		}); err != nil {
+			log.Println("[pushMessageNow] write json fail", err)
+			return err
+		}
+		return nil
+	}
 	if err := conn.WriteJSON(gin.H{
-		"event":    "message notification",
-		"messages": list,
+		"event":    "message summary",
+		"messages": sumList,
 	}); err != nil {
 		log.Println("[pushMessageNow] write json fail", err)
 		return err
 	}
 	return nil
+}
+
+func MessageListener(c *gin.Context) {
+	id := config.VIPUser
+	var req Summary
+	_ = c.ShouldBindJSON(&req)
+	conn, ok := wsPool[id]
+	if ok {
+		_, err := StoreMessage(int64(id), req, 1, 2)
+		if err != nil {
+			log.Println("[MessageListener] store message fail", err)
+			return
+		}
+		if err := conn.WriteJSON(gin.H{
+			"event":   "message summary",
+			"summary": req.Summary,
+		}); err != nil {
+			log.Println("[MessageListener] write json fail", err)
+		}
+		return
+	}
+	_, err := StoreMessage(int64(id), req, 0, 2)
+	if err != nil {
+		log.Println("[MessageListener] store message fail", err)
+		return
+	}
 }

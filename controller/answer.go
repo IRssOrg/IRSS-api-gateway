@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"irss-gateway/dispatcher"
 	"log"
 	"net/http"
 )
@@ -69,16 +70,24 @@ func GetAnswer(c *gin.Context) {
 			log.Println("[GetAnswer] get fail", err)
 			continue
 		}
+		var preSummary string
 		_ = json.NewDecoder(resp.Body).Decode(&answerItems)
 		var references []AnswerContent
-		for _, vv := range answerItems.Ret[1:] {
+		for _, vv := range answerItems.Ret {
 			references = append(references, AnswerContent{
 				Content: vv.Content,
 				Title:   v.Title,
 			})
+			preSummary += vv.Content
 		}
+		hash, err := dispatcher.UploadPassage(preSummary)
+		if err != nil {
+			log.Println("[GetAnswer] upload fail", err)
+			continue
+		}
+		summary, err := dispatcher.Summary(hash)
 		answer := HandledAnswer{
-			Summary:    answerItems.Ret[0].Content,
+			Summary:    summary,
 			References: references,
 		}
 		answers = append(answers, answer)

@@ -25,5 +25,6 @@
     "qq_summary": "",
     "topic_processor": "http://127.0.0.1:8003"
   },
-  "gpt_token": "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"
+  "gpt_token": "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",
+  "vip_user": 4
 }

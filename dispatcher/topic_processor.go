@@ -50,7 +50,7 @@ func AskQuestion(hash string, question string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := http.Post(QQUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(PassageUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return "", err
 	}
@@ -72,7 +72,7 @@ func Summary(hash string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	resp, err := http.Post(QQUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(PassageUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return "", err
 	}
@@ -94,7 +94,7 @@ func GetPassageTopics(hash string) ([]models.TopicWithRelative, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp, err := http.Post(QQUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
+	resp, err := http.Post(PassageUrl+"/passage/"+hash, "application/json", bytes.NewReader(byte))
 	if err != nil {
 		return nil, err
 	}
