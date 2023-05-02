@@ -67,7 +67,9 @@ func AddTopics(c *gin.Context) {
 	}
 	resp.StatusCode = 0
 	c.JSON(200, resp)
-	return
+	go func() {
+		_ = SubscriptionTimer(id.(int64))
+	}()
 }
 
 func AddTopicList(topicsRef []string, id int64) error {

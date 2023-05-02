@@ -22,11 +22,23 @@ type passageResp struct {
 	Ret []passages `json:"ret"`
 }
 
+type videoResp struct {
+	Ret []Videos `json:"ret"`
+}
+
 type passages struct {
 	Title     string `json:"title"`
 	Id        int64  `json:"id"`
 	Time      string `json:"time"`
 	TimeStamp int64  `json:"timestamp"`
+}
+
+type Videos struct {
+	Title       string `json:"title"`
+	Id          string `json:"id"`
+	Time        string `json:"time"`
+	TimeStamp   int64  `json:"timestamp"`
+	Description string `json:"description"`
 }
 
 type ArticleResp struct {
@@ -103,9 +115,9 @@ func GetWhat2Push(id int64, isOnline bool) ([]ArticleResp, error) {
 	var pushEvent []ArticleResp
 	timeRef, ok := LastUpdateTimeMap[id]
 	if !ok {
-		timeRef.Zhihu = time.Now().Unix()
-		timeRef.Wechat = time.Now().Unix()
-		timeRef.Bilibili = time.Now().Unix()
+		timeRef.Zhihu = time.Now().Unix() - 100000
+		timeRef.Wechat = time.Now().Unix() - 100000
+		timeRef.Bilibili = time.Now().Unix() - 100000
 	}
 	for _, author := range UserSubListMap[id].Zhihu {
 		resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "zhihu")
@@ -117,15 +129,63 @@ func GetWhat2Push(id int64, isOnline bool) ([]ArticleResp, error) {
 		pushEvent = append(pushEvent, articleList...)
 	}
 	for _, author := range UserSubListMap[id].Wechat {
-		resp, err := GetFromAuthor(author.Id, timeRef.Zhihu, "wechat")
+		resp, err := GetFromAuthor(author.Id, timeRef.Wechat, "wechat")
 		if err != nil {
-			log.Println("[SubscriptionTimer] get zhihu author fail", err)
+			log.Println("[SubscriptionTimer] get wechat author fail", err)
 			continue
 		}
 		articleList, err := SelectRelativePassages(resp, "wechat", id, isOnline)
 		pushEvent = append(pushEvent, articleList...)
 	}
+	for _, author := range UserSubListMap[id].Bilibili {
+		resp, err := GetVideos(author.Id, timeRef.Bilibili)
+		if err != nil {
+			log.Println("[SubscriptionTimer] get bilibili author fail", err)
+			continue
+		}
+		articleList, err := SelectRelativeVideos(resp, id, isOnline)
+		pushEvent = append(pushEvent, articleList...)
+	}
 	return pushEvent, nil
+}
+
+func SelectRelativeVideos(resp []Videos, id int64, isOnline bool) ([]ArticleResp, error) {
+	var articleList []ArticleResp
+	for _, v := range resp {
+		hash, err := dispatcher.UploadPassage(v.Description)
+		if err != nil {
+			continue
+		}
+		topicString, err := GetTopicString(id)
+		if err != nil {
+			continue
+		}
+		relatives, err := dispatcher.ConfirmTopicWithRelative(hash, topicString)
+		if err != nil {
+			continue
+		}
+		var article ArticleResp
+		article.MediaType = "video"
+		article.Platform = "bilibili"
+		article.Content = "https://www.bilibili.com/video/" + v.Id
+		article.Time = v.Time
+		for _, v := range relatives {
+			rel, err := strconv.ParseFloat(v.Relative, 64)
+			if err != nil {
+				log.Println("[SubscriptionTimer] parse relative fail", err)
+				continue
+			}
+			if rel > 0.5 {
+				LastId, _ := StoreArticle(id, article, isOnline)
+				article.Id = string(LastId)
+				article.Topic = v.Topic
+				articleList = append(articleList, article)
+				break
+			}
+		}
+
+	}
+	return articleList, nil
 }
 
 func SelectRelativePassages(resp []passages, platform string, id int64, isOnline bool) ([]ArticleResp, error) {
@@ -159,7 +219,13 @@ func IfRelative(article ArticleResp, id int64, isOnline bool) (ArticleResp, bool
 		return article, false, err
 	}
 	topicString, err := GetTopicString(id)
+	if err != nil {
+		return article, false, err
+	}
 	relatives, err := dispatcher.ConfirmTopicWithRelative(hash, topicString)
+	if err != nil {
+		return article, false, err
+	}
 	for _, v := range relatives {
 		rel, err := strconv.ParseFloat(v.Relative, 64)
 		if err != nil {
@@ -209,6 +275,28 @@ func pushArticleNow(id int64) error {
 	return nil
 }
 
+func GetVideos(id string, timeRef int64) ([]Videos, error) {
+	url := config.Spider.Bilibili + "/api/passages/" + id + "/0"
+	resp, err := http.Get(url)
+	var respList videoResp
+	if err != nil {
+		return respList.Ret, err
+	}
+	err = json.NewDecoder(resp.Body).Decode(&respList)
+	//log.Println(respList.Ret)
+	defer resp.Body.Close()
+	if err != nil {
+		return respList.Ret, err
+	}
+	var ret []Videos
+	for _, v := range respList.Ret {
+		if v.TimeStamp > timeRef {
+			ret = append(ret, v)
+		}
+	}
+	return ret, nil
+}
+
 func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error) {
 	url := config.Spider.Zhihu + "/api/passages/" + id + "/0"
 	switch platform {
@@ -225,6 +313,7 @@ func GetFromAuthor(id string, timeRef int64, platform string) ([]passages, error
 	if err != nil {
 		return respList.Ret, err
 	}
+
 	err = json.NewDecoder(resp.Body).Decode(&respList)
 	//log.Println(respList.Ret)
 	defer resp.Body.Close()

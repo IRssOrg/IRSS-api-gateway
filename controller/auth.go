@@ -137,5 +137,4 @@ func Register(c *gin.Context) {
 		Id:         id,
 	})
 
-	return
 }
