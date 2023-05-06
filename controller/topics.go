@@ -96,6 +96,17 @@ func AddTopicList(topicsRef []string, id int64) error {
 		log.Println("[setArticleTopic] exec stmt fail", err)
 		return err
 	}
+	conn, ok := wsPool[id]
+	if !ok {
+		log.Println("[setArticleTopic] get conn fail")
+		return nil
+	}
+	if err := conn.WriteJSON(gin.H{
+		"event":  "article topic update",
+		"topics": topics,
+	}); err != nil {
+		log.Println("[setArticleTopic] write json fail", err)
+	}
 	return nil
 }
 

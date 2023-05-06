@@ -7,6 +7,7 @@ import (
 )
 
 func initRouter(r *gin.Engine) {
+	r.GET("/auth", controller.Auth, controller.CheckToken)
 	beforeAuth := r.Group("/auth")
 	beforeAuth.POST("/login", controller.Login)
 	beforeAuth.POST("/register", controller.Register)
@@ -50,5 +51,5 @@ func main() {
 
 	if err := r.Run("0.0.0.0:8080"); err != nil {
 		log.Fatal(err)
-	}
+	} // this method will block the calling goroutine unless an err happens
 }

@@ -18,6 +18,13 @@ Content-Type: application/json
     "password": "123456"
 }
 
+
+### checkToken
+GET http://127.0.0.1:8080/auth
+Accept: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODU5MzEzNzAsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.cdNVz1eUI0NvMi0mXEizrRY44FkKHftFCcWBh07xhV0
+
+
 ### set topics article
 POST http://127.0.0.1:8080/info/article/topics/selected
 Accept: application/json
@@ -35,19 +42,6 @@ GET http://127.0.0.1:8080/info/article/topics/selected
 Accept: application/json
 Content-Type: application/json
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
-
-
-
-#POST http://127.0.0.1:8080/subscription/config
-#Accept: application/json
-#Content-Type: application/json
-#Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODQ2NzQ5MzQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.HwmR91APPwAbwvTR_9mZUsjL34HZWy-fTHyL2gWC_CI
-#
-#{
-#  "articleTime": 600,
-#  "messageTime": 600,
-#  "videoTime": 600
-#}
 
 
 ### get accounts
@@ -121,6 +115,27 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVz
 {
   "username": "xiwen",
   "id": "xiwen-96-2"
+}
+
+### search author wechat
+POST http://127.0.0.1:8080/info/subscription/wechat/author/
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "question": "毕导"
+}
+
+### add subscription wechat
+POST http://127.0.0.1:8080/info/subscription/author/wechat/subscribed
+Accept: application/json
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2ODUzNDA5NTQsInVzZXJJZCI6NCwidXNlcm5hbWUiOiJ4aWFvdG9uZyJ9.hZOUKrblFfDb6hj_ouAOMVqEN0JXelr-AJijqFCMlAY
+
+{
+  "username": "xiwsdfen",
+  "id": "xiwen-96-2sdf"
 }
 
 ### delete subscription

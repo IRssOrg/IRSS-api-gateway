@@ -44,6 +44,7 @@ type Videos struct {
 type ArticleResp struct {
 	Platform  string `json:"platform"`
 	MediaType string `json:"media_type"`
+	Title     string `json:"title"`
 	Content   string `json:"content"`
 	Time      string `json:"time"`
 	Topic     string `json:"topic"`
@@ -86,27 +87,33 @@ func SubscriptionTimer(id int64) error {
 	} else {
 		cronObj.Stop()
 		cronObj = cron.New()
-		Timers[id] = cronObj
-	}
+		Timers[id] = cronObj // 因为放到了全局了map中所以有全局的生存期？
+	} // 一切神奇的生存期都生存于context中？
+	// 全局中的goroutine到底开在了那里
+	//因为cron是全局map中的一个值， 所以对于cron这个对象而言生存期是整个程序，属于该对象的函数所开的goroutine相应的也有全局的生存期
 	log.Println("[SubscriptionTimer] cron starting")
-	_, err = cronObj.AddFunc(config.ArticleTime, func() {
-		log.Println("[SubscriptionTimer] cron running")
-		conn, ok := wsPool[int(id)]
-		pushEvent, err := GetWhat2Push(id, ok)
-		if err != nil {
-			log.Println("[SubscriptionTimer] get what to push fail", err)
-			return
-		}
-		if ok {
-			if err := conn.WriteJSON(gin.H{
-				"event":    "article notification",
-				"articles": pushEvent,
-			}); err != nil {
-				log.Println("[SubscriptionTimer] push zhihu article fail", err)
+	_, err = cronObj.AddFunc(
+		config.ArticleTime, func() {
+			log.Println("[SubscriptionTimer] cron running")
+			conn, ok := wsPool[id]
+			pushEvent, err := GetWhat2Push(id, ok)
+			if err != nil {
+				log.Println("[SubscriptionTimer] get what to push fail", err)
+				return
 			}
-		}
+			if ok {
+				if err := conn.WriteJSON(
+					gin.H{
+						"event":    "article notification",
+						"articles": pushEvent,
+					},
+				); err != nil {
+					log.Println("[SubscriptionTimer] push zhihu article fail", err)
+				}
+			}
 
-	})
+		},
+	)
 	cronObj.Start()
 	log.Println("[SubscriptionTimer] cron start")
 	//time.Sleep(time.Hour * 72)
@@ -203,7 +210,7 @@ func SelectRelativePassages(resp []passages, platform string, id int64, isOnline
 			log.Println("[SubscriptionTimer] get zhihu article fail", err)
 			continue
 		}
-		article.Time = v.Time
+		article.Time = string(v.TimeStamp)
 		article, ok, err := IfRelative(article, id, isOnline)
 		topicWithRel, err := dispatcher.GetPassageTopics(article.Content)
 
@@ -241,7 +248,7 @@ func IfRelative(article ArticleResp, id int64, isOnline bool) (ArticleResp, bool
 		}
 		if rel > 0.5 {
 			LastId, _ := StoreArticle(id, article, isOnline)
-			article.Id = string(LastId)
+			article.Id = strconv.Itoa(int(LastId))
 			article.Topic = v.Topic
 			return article, true, nil
 		}
@@ -256,10 +263,27 @@ func pushArticleNow(id int64) error {
 		log.Println("[pushArticleNow] query fail", err)
 		return err
 	}
-
+	IsNew := false
 	for rows.Next() {
 		var article ArticleResp
-		err := rows.Scan(&article.Id, &article.Content, &article.Time, &article.MediaType, &article.Topic, &article.Platform)
+		err := rows.Scan(
+			&article.Id, &article.Content, &article.Time, &article.MediaType, &article.Topic,
+			&article.Platform,
+		)
+		if err != nil {
+			log.Println("[pushArticleNow] scan fail", err)
+			return err
+		}
+		articleList = append(articleList, article)
+		IsNew = true
+	}
+	rows, err = pool.Query("select id, content, time, media_type, topic, platform from " + strconv.Itoa(int(id)) + "_article")
+	for rows.Next() {
+		var article ArticleResp
+		err := rows.Scan(
+			&article.Id, &article.Content, &article.Time, &article.MediaType, &article.Topic,
+			&article.Platform,
+		)
 		if err != nil {
 			log.Println("[pushArticleNow] scan fail", err)
 			return err
@@ -267,15 +291,18 @@ func pushArticleNow(id int64) error {
 		articleList = append(articleList, article)
 	}
 	_, err = pool.Exec("update " + strconv.Itoa(int(id)) + "_article set checked=1 where checked=0")
-	conn, ok := wsPool[int(id)]
+	conn, ok := wsPool[id]
 	if !ok {
 		log.Println("[pushArticleNow] conn not exist")
 		return nil
 	}
-	if err := conn.WriteJSON(gin.H{
-		"event":    "article notification",
-		"articles": articleList,
-	}); err != nil {
+	if err := conn.WriteJSON(
+		gin.H{
+			"event":    "article notification",
+			"is_new":   IsNew,
+			"articles": articleList,
+		},
+	); err != nil {
 		log.Println("[pushArticleNow] push article fail", err)
 		return err
 	}
@@ -388,6 +415,7 @@ func SearchPassage(id string, platform string) (ArticleResp, error) {
 	ret.Platform = platform
 	ret.Topic = "miku"
 	ret.MediaType = "article"
+	ret.Title = article.Title
 	ret.Id = id
 	return ret, nil
 }
@@ -397,7 +425,11 @@ func StoreArticle(id int64, article ArticleResp, checked bool) (int64, error) {
 	if checked {
 		isChecked = 1
 	}
-	result, err := pool.Exec("INSERT INTO "+strconv.Itoa(int(id))+"_article (platform, media_type, content, topic, checked, time) VALUES (?, ?, ?, ?, ?, ?)", article.Platform, article.MediaType, article.Content, article.Topic, isChecked, article.Time)
+	result, err := pool.Exec(
+		"INSERT INTO "+strconv.Itoa(int(id))+"_article (platform, media_type, content, topic, checked, time) VALUES (?, ?, ?, ?, ?, ?)",
+		article.Platform, article.MediaType, article.Content, article.Topic, isChecked,
+		article.Time,
+	)
 	if err != nil {
 		log.Println("[StoreArticle] store article fail", err)
 		return 0, err

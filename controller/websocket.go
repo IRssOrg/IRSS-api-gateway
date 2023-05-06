@@ -11,7 +11,7 @@ import (
 import "github.com/gorilla/websocket"
 
 var (
-	wsPool   = make(map[int]*websocket.Conn)
+	wsPool   = make(map[int64]*websocket.Conn)
 	upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -31,7 +31,7 @@ func WsHandler(c *gin.Context) {
 		log.Println("[WsHandler] get userId fail")
 		return
 	}
-	id := idCode.(int)
+	id := idCode.(int64)
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -41,17 +41,17 @@ func WsHandler(c *gin.Context) {
 	}
 	wsPool[id] = conn
 
-	if err := pushArticleNow(int64(id)); err != nil {
+	if err := pushArticleNow(id); err != nil {
 		log.Println("[WsHandler] pushArticleNow fail", err)
 	}
-	if err := pushMessageNow(int64(id), 1); err != nil {
+	if err := pushMessageNow(id, 1); err != nil {
 		log.Println("[WsHandler] pushMessageNow fail", err)
 	}
-	if err := pushMessageNow(int64(id), 2); err != nil {
+	if err := pushMessageNow(id, 2); err != nil {
 		log.Println("[WsHandler] pushMessageNow fail", err)
 	}
 	go func() {
-		_ = SubscriptionTimer(int64(id))
+		_ = SubscriptionTimer(id)
 	}()
 	for {
 		_, _, err := conn.ReadMessage()

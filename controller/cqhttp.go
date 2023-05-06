@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -21,6 +22,7 @@ type Message struct {
 	Topic           string `json:"topic"`
 	OriginalContent string `json:"original_content"`
 	Id              string `json:"id"`
+	NickName        string `json:"nickname"`
 }
 
 type Summary struct {
@@ -45,11 +47,13 @@ func TopicListener(c *gin.Context) {
 	}
 	original := Message{
 		Content:         req.Summary,
-		Time:            time.Now().Format("2006-01-02 15:04:05"),
-		Topic:           req.Topic,
+		Time:            strconv.FormatInt(time.Now().Unix(), 10),
 		OriginalContent: req.RawText,
+		NickName:        req.User,
+		Topic:           req.Topic,
 	}
-	conn, ok := wsPool[int(id)]
+
+	conn, ok := wsPool[id]
 	isChecked := 1
 	if !ok {
 		isChecked = 0
@@ -61,12 +65,15 @@ func TopicListener(c *gin.Context) {
 		return
 	}
 	lastId, err := StoreMessage(id, original, isChecked, 1)
-	original.Id = string(lastId)
+	original.Id = strconv.Itoa(int(lastId))
 	var list []Message
 	list = append(list, original)
 	msg := gin.H{
 		"event":    "message notification",
 		"messages": list,
+	}
+	if req.Topic == config.VIPUserNickName {
+		msg["event"] = "mentioned notification"
 	}
 	err = conn.WriteJSON(msg)
 }
@@ -88,9 +95,17 @@ func StoreMessage(id int64, msg any, checked int, typeCode int) (int64, error) {
 }
 
 func pushMessageNow(id int64, typeCode int) error {
-	rows, err := pool.Query("select message from message where user_id=? and is_checked=0 and type=1", id)
+	IsNew := true
+	var msgRef []byte
+	rows, err := pool.Query("select message from message where user_id=? and type=1", id)
+	if err := pool.QueryRow("select message from message where user_id=? and type=1 and checked=0", id).Scan(&msgRef); err != nil {
+		IsNew = false
+	}
 	if typeCode == 2 {
-		rows, err = pool.Query("select message from message where user_id=? and is_checked=0 and type=2", id)
+		rows, err = pool.Query("select message from message where user_id=? and type=2", id)
+		if err := pool.QueryRow("select message from message where user_id=? and type=2 and checked=0", id).Scan(&msgRef); err != nil {
+			IsNew = false
+		}
 	}
 	if err != nil {
 		log.Println("[pushMessageNow] query fail", err)
@@ -124,7 +139,7 @@ func pushMessageNow(id int64, typeCode int) error {
 		sumList = append(sumList, sum)
 
 	}
-	conn, ok := wsPool[int(id)]
+	conn, ok := wsPool[id]
 	if !ok {
 		return nil
 	}
@@ -148,6 +163,7 @@ func pushMessageNow(id int64, typeCode int) error {
 	}
 	if err := conn.WriteJSON(gin.H{
 		"event":    "message summary",
+		"is_new":   IsNew,
 		"messages": sumList,
 	}); err != nil {
 		log.Println("[pushMessageNow] write json fail", err)

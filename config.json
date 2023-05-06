@@ -13,7 +13,8 @@
   "qq_topics": {
     "topics": [
       "vocaloid1",
-      "vocaloid2"
+      "vocaloid2",
+      "徯璺"
     ]
   },
   "spider": {
@@ -26,5 +27,6 @@
     "topic_processor": "http://127.0.0.1:8003"
   },
   "gpt_token": "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",
-  "vip_user": 4
+  "vip_user": 4,
+  "vip_user_nickname": "徯璺"
 }
